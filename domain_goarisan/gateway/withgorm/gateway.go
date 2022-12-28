@@ -2,7 +2,6 @@ package withgorm
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -83,12 +82,15 @@ func (r *gateway) SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGr
 	return nil
 }
 
-func (r *gateway) FindGrupArisanById(ctx context.Context, GrupArisanId vo.GruparisanID) (*entity.Gruparisan, error) {
+func (r *gateway) FindGrupArisanAndUserById(ctx context.Context, GrupArisanId vo.GruparisanID, UserID vo.UserID) (*entity.Gruparisan, error) {
 	var gruparisan entity.Gruparisan
+	var user entity.DetailGrupArisan
 	if err := r.Db.First(&gruparisan, "id = ?", GrupArisanId); err.RecordNotFound() {
 		return nil, errorenum.DataNotFound
 	}
-	fmt.Println(GrupArisanId)
+	if err := r.Db.First(&user, "id_user = ?", UserID).First(&user, "id_detail_grup = ?", GrupArisanId); !err.RecordNotFound() {
+		return nil, errorenum.UserAlreadyJoin
+	}
 
 	return &gruparisan, nil
 }

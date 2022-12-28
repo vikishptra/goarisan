@@ -24,5 +24,5 @@ type SaveDetailGrupArisanRepo interface {
 }
 
 type FindGrupArisanByIdRepo interface {
-	FindGrupArisanById(ctx context.Context, someID vo.GruparisanID) (*entity.Gruparisan, error)
+	FindGrupArisanAndUserById(ctx context.Context, someID vo.GruparisanID, userID vo.UserID) (*entity.Gruparisan, error)
 }

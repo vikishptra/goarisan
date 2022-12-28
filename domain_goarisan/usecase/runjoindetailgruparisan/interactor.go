@@ -23,16 +23,11 @@ func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req Inp
 	if err != nil {
 		return nil, err
 	}
-	grupObjs, err := r.outport.FindGrupArisanById(ctx, req.ReqDetail.ID_Detail_Grup)
+	grupObjs, err := r.outport.FindGrupArisanAndUserById(ctx, req.ReqDetail.ID_Detail_Grup, userObjs.ID)
 	if err != nil {
 		return nil, err
 	}
 	var RulesMoney = grupObjs.RulesMoney
-	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
-
-	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
-		return nil, err
-	}
 
 	detailGrup, err := entity.JoinGrupArisan(req.ReqDetail)
 	if err != nil {
@@ -44,6 +39,11 @@ func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req Inp
 	}
 
 	if err := r.outport.SaveDetailGrupArisan(ctx, detailGrup); err != nil {
+		return nil, err
+	}
+	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
+
+	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
 		return nil, err
 	}
 

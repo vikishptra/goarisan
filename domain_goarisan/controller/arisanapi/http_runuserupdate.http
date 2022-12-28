@@ -1,5 +1,5 @@
 PUT  http://localhost:8001/api/v1/user/5ad6805a-37b9-4bc3-ac9a-cf624791eba7
 
 {
-    "name" : "update 1"
+    "name" : "update 4"
 }
