@@ -1,4 +1,4 @@
-POST http://localhost:8001/api/v1/user/5ad6805a-37b9-4bc3-ac9a-cf624791eba7/join/grup
+POST http://localhost:8001/api/v1/user/1ac345cf-dc1a-4601-954b-3e0720384070/join/grup
 
 
 {
