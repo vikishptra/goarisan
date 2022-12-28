@@ -22,3 +22,7 @@ type SaveGrupArisanRepo interface {
 type SaveDetailGrupArisanRepo interface {
 	SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGrupArisan) error
 }
+
+type FindGrupArisanByIdRepo interface {
+	FindGrupArisanById(ctx context.Context, someID vo.GruparisanID) (*entity.Gruparisan, error)
+}

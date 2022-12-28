@@ -1,0 +1,10 @@
+POST http://localhost:8001/api/v1/user/1ac345cf-dc1a-4601-954b-3e0720384070/join/grup
+
+
+{
+    "id_detail_grup":"GRP-c7eaae5d-051d-4ff0-8b73-5f2024d51e41"
+}
+
+# { 
+#   "id_detail_grup": "GRP-27f62570-0d7d-4e33-9bc4-34966b772408"
+# }
