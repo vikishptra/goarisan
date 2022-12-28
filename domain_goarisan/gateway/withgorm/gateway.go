@@ -86,7 +86,7 @@ func (r *gateway) SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGr
 func (r *gateway) FindGrupArisanById(ctx context.Context, GrupArisanId vo.GruparisanID) (*entity.Gruparisan, error) {
 	var gruparisan entity.Gruparisan
 	if err := r.Db.First(&gruparisan, "id = ?", GrupArisanId); err.RecordNotFound() {
-		return nil, errorenum.MoneyMin
+		return nil, errorenum.DataNotFound
 	}
 	fmt.Println(GrupArisanId)
 

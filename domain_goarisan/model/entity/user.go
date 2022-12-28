@@ -59,11 +59,3 @@ func (r *User) Update(req UserUpdateRequest) error {
 	}
 	return nil
 }
-
-func (r *User) UpdateMoneyUser(reqRules GruparisanCreateRequest) error {
-
-	r.Money = r.Money - reqRules.RulesMoney
-
-	return nil
-
-}

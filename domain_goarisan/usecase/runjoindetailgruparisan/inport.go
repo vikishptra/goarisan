@@ -9,6 +9,7 @@ type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
 	ReqDetail entity.DetailGrupArisanCreateRequest
+	ReqGrup   entity.GruparisanCreateRequest
 }
 
 type InportResponse struct {

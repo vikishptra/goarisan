@@ -41,10 +41,13 @@ func JoinGrupArisan(req DetailGrupArisanCreateRequest) (*DetailGrupArisan, error
 	Gruparisan.Created = req.Now
 	return &Gruparisan, nil
 }
-func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest) error {
-
-	if strings.TrimSpace(string(req.ID_Detail_Grup)) == "" || strings.TrimSpace(string(req.ID_User)) == "" {
+func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest, reqUser *User, uang int64) error {
+	if reqUser.Money == 0 {
+		return errorenum.MoneyMin
+	} else if strings.TrimSpace(string(req.ID_Detail_Grup)) == "" || strings.TrimSpace(string(req.ID_User)) == "" {
 		return errorenum.MessageNotEmpty
+	} else if uang >= reqUser.Money {
+		return errorenum.UserStrapped
 	}
 	return nil
 }

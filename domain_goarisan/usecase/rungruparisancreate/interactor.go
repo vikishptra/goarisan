@@ -33,8 +33,8 @@ func (r *runGrupArisanCreateInteractor) Execute(ctx context.Context, req InportR
 	if err := grupObj.ValidateGrupCreate(req.GruparisanCreateRequest, userObjs); err != nil {
 		return nil, err
 	}
-
-	userObjs.UpdateMoneyUser(req.GruparisanCreateRequest)
+	var RulesMoney = req.GruparisanCreateRequest.RulesMoney
+	grupObj.UpdateMoneyUserGrup(RulesMoney, userObjs)
 
 	if err := r.outport.SaveGrupArisan(ctx, grupObj); err != nil {
 		return nil, err

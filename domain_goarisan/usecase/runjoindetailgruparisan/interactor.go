@@ -19,11 +19,18 @@ func NewUsecase(outputPort Outport) Inport {
 func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
 	res := &InportResponse{}
-	_, err := r.outport.FindUserByID(ctx, req.ReqDetail.ID_User)
+	userObjs, err := r.outport.FindUserByID(ctx, req.ReqDetail.ID_User)
 	if err != nil {
 		return nil, err
 	}
-	if _, err := r.outport.FindGrupArisanById(ctx, req.ReqDetail.ID_Detail_Grup); err != nil {
+	grupObjs, err := r.outport.FindGrupArisanById(ctx, req.ReqDetail.ID_Detail_Grup)
+	if err != nil {
+		return nil, err
+	}
+	var RulesMoney = grupObjs.RulesMoney
+	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
+
+	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
 		return nil, err
 	}
 
@@ -31,7 +38,8 @@ func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req Inp
 	if err != nil {
 		return nil, err
 	}
-	if err := detailGrup.ValidateGrupJoin(req.ReqDetail); err != nil {
+
+	if err := detailGrup.ValidateGrupJoin(req.ReqDetail, userObjs, RulesMoney); err != nil {
 		return nil, err
 	}
 

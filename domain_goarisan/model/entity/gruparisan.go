@@ -76,3 +76,13 @@ func (r *Gruparisan) SetIdUser(req *User) error {
 
 	return nil
 }
+func (g *Gruparisan) UpdateMoneyUserGrup(reqRules int64, r *User) error {
+
+	if int64(r.Money) == 0 {
+		return errorenum.MoneyMin
+	}
+	r.Money = r.Money - reqRules
+
+	return nil
+
+}
