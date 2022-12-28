@@ -1,8 +1,8 @@
-POST http://localhost:8001/api/v1/user/753621bb-1771-4c3d-9134-0c4a4d5e5ab8/join/grup
+POST http://localhost:8001/api/v1/user/5ad6805a-37b9-4bc3-ac9a-cf624791eba7/join/grup
 
 
 {
-    "id_detail_grup":"GRP-df2f29e9-59e5-4a83-b11f-c403e490410c"
+    "id_detail_grup":"GRP-9cd989fe-56b4-4cfd-b797-3a53fd664feb"
 }
 
 # { 
