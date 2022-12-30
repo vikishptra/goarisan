@@ -61,7 +61,7 @@ func (r *DetailGrupArisan) Update(req DetailGrupArisanUpdateRequest) error {
 
 	return nil
 }
-func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupArisanCreateRequest) (*DetailGrupArisan, error) {
+func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupArisanCreateRequest, reqUser *User) (*DetailGrupArisan, error) {
 	id, err := vo.NewDetailGrupArisanID(reqRand.RandomString, req.Created)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupAris
 	r.ID = id
 	r.Created = req.Created
 	r.ID_Detail_Grup = req.ID
-	r.ID_User = req.ID_Owner
+	r.ID_User = reqUser.ID
 	r.Created = req.Created
 	r.Money = req.RulesMoney
 	return r, nil

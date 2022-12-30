@@ -44,7 +44,7 @@ func (r *runGrupArisanCreateInteractor) Execute(ctx context.Context, req InportR
 	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
 		return nil, err
 	}
-	detailGrup, err := req.Detail.SetDetailGrup(grupObj, req.DetailReq)
+	detailGrup, err := req.Detail.SetDetailGrup(grupObj, req.DetailReq, userObjs)
 	if err != nil {
 		return nil, err
 	}
