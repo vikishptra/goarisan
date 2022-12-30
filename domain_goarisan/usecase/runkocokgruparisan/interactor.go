@@ -2,6 +2,8 @@ package runkocokgruparisan
 
 import (
 	"context"
+
+	"vikishptra/shared/util"
 )
 
 type runKocokGrupArisanInteractor struct {
@@ -18,8 +20,11 @@ func (r *runKocokGrupArisanInteractor) Execute(ctx context.Context, req InportRe
 
 	res := &InportResponse{}
 
-	// code your usecase definition here ...
-	//!
+	detailGrupObj, err := r.outport.FindUndianArisanUser(ctx, req.IDGrup)
+	if err != nil {
+		return nil, err
+	}
+	res.Items = util.ToSliceAny(detailGrupObj)
 
 	return res, nil
 }

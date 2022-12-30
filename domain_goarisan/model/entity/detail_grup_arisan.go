@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"math/rand"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ type DetailGrupArisan struct {
 	ID_User          vo.UserID             `json:"id_user" uri:"id"`
 	StatusUserArisan bool                  `bson:"status_user_arisan"`
 	Money            int64                 `json:"money"`
+	No_undian        int                   `json:"no_undian"`
 	Created          time.Time             `bson:"created" json:"created"`
 }
 
@@ -66,12 +68,14 @@ func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupAris
 	if err != nil {
 		return nil, err
 	}
+
 	r.ID = id
 	r.Created = req.Created
 	r.ID_Detail_Grup = req.ID
 	r.ID_User = reqUser.ID
 	r.Created = req.Created
 	r.Money = req.RulesMoney
+	r.No_undian = rand.Intn(100)
 	return r, nil
 
 }

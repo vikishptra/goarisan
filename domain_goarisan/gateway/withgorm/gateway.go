@@ -14,7 +14,7 @@ import (
 	"vikishptra/shared/infrastructure/logger"
 )
 
-type gateway struct {
+type Gateway struct {
 	log     logger.Logger
 	appData gogen.ApplicationData
 	config  *config.Config
@@ -22,7 +22,7 @@ type gateway struct {
 }
 
 // NewGateway ...
-func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *gateway {
+func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
 	Db, err := gorm.Open("mysql", "root:@tcp(localhost:3306)/arisan?charset=utf8&parseTime=True")
 
 	if err != nil {
@@ -36,7 +36,7 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	if err != nil {
 		panic(err)
 	}
-	return &gateway{
+	return &Gateway{
 		log:     log,
 		appData: appData,
 		config:  cfg,
@@ -44,7 +44,7 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	}
 }
 
-func (r *gateway) SaveUser(ctx context.Context, obj *entity.User) error {
+func (r *Gateway) SaveUser(ctx context.Context, obj *entity.User) error {
 	r.log.Info(ctx, "called")
 
 	if err := r.Db.Save(obj).Error; err != nil {
@@ -53,7 +53,7 @@ func (r *gateway) SaveUser(ctx context.Context, obj *entity.User) error {
 	return nil
 }
 
-func (r *gateway) FindUserByID(ctx context.Context, UserID vo.UserID) (*entity.User, error) {
+func (r *Gateway) FindUserByID(ctx context.Context, UserID vo.UserID) (*entity.User, error) {
 	r.log.Info(ctx, "called")
 	var user entity.User
 	if err := r.Db.First(&user, "id = ?", UserID); err.RecordNotFound() {
@@ -62,7 +62,7 @@ func (r *gateway) FindUserByID(ctx context.Context, UserID vo.UserID) (*entity.U
 	return &user, nil
 }
 
-func (r *gateway) SaveGrupArisan(ctx context.Context, obj *entity.Gruparisan) error {
+func (r *Gateway) SaveGrupArisan(ctx context.Context, obj *entity.Gruparisan) error {
 
 	r.log.Info(ctx, "called")
 	if err := r.Db.Save(obj).Error; err != nil {
@@ -72,7 +72,7 @@ func (r *gateway) SaveGrupArisan(ctx context.Context, obj *entity.Gruparisan) er
 	return nil
 }
 
-func (r *gateway) SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGrupArisan) error {
+func (r *Gateway) SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGrupArisan) error {
 	r.log.Info(ctx, "called")
 
 	if err := r.Db.Save(obj).Error; err != nil {
@@ -82,7 +82,7 @@ func (r *gateway) SaveDetailGrupArisan(ctx context.Context, obj *entity.DetailGr
 	return nil
 }
 
-func (r *gateway) FindGrupArisanAndUserById(ctx context.Context, GrupArisanId vo.GruparisanID, UserID vo.UserID) (*entity.Gruparisan, error) {
+func (r *Gateway) FindGrupArisanAndUserById(ctx context.Context, GrupArisanId vo.GruparisanID, UserID vo.UserID) (*entity.Gruparisan, error) {
 	var gruparisan entity.Gruparisan
 	var user entity.DetailGrupArisan
 	if err := r.Db.First(&gruparisan, "id = ?", GrupArisanId); err.RecordNotFound() {
@@ -93,4 +93,20 @@ func (r *gateway) FindGrupArisanAndUserById(ctx context.Context, GrupArisanId vo
 	}
 
 	return &gruparisan, nil
+}
+
+func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup string) ([]map[string]any, error) {
+	var detailGrupArisan entity.DetailGrupArisan
+	var result []map[string]any
+
+	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
+		return nil, errorenum.DataNotFound
+	}
+	users, _ := r.FindUserByID(ctx, detailGrupArisan.ID_User)
+
+	result = append(result, map[string]any{"id_user": detailGrupArisan.ID_User, "no_undian": detailGrupArisan.No_undian, "name": users.Name})
+
+	r.Db.Model(entity.DetailGrupArisan{}).Where("id_user = ?", detailGrupArisan.ID_User).Update("status_user_arisan", true)
+
+	return result, nil
 }
