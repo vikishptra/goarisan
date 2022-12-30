@@ -9,12 +9,11 @@ import (
 )
 
 type Gruparisan struct {
-	ID          vo.GruparisanID `bson:"_id" json:"id"`
-	Created     time.Time       `bson:"created" json:"created"`
-	NamaGrup    string          `json:"nama_grup"`
-	ID_Owner    vo.UserID       `uri:"id" json:"id_owner"`
-	RulesMoney  int64           `json:"rules_money"`
-	ResultMoney int64           `json:"result_money"`
+	ID         vo.GruparisanID `bson:"_id" json:"id"`
+	Created    time.Time       `bson:"created" json:"created"`
+	NamaGrup   string          `json:"nama_grup"`
+	ID_Owner   vo.UserID       `uri:"id" json:"id_owner"`
+	RulesMoney int64           `json:"rules_money"`
 }
 
 type GruparisanCreateRequest struct {
@@ -24,7 +23,6 @@ type GruparisanCreateRequest struct {
 	NamaGrup     string    `json:"nama_grup"`
 	JumlahUsers  int64     `json:"jumlah_users"`
 	RulesMoney   int64     `json:"rules_money"`
-	ResultMoney  int64     `json:"result_money"`
 }
 
 func (r *Gruparisan) ValidateGrupCreate(req GruparisanCreateRequest, reqUser *User) error {
@@ -52,7 +50,6 @@ func NewGruparisan(req GruparisanCreateRequest) (*Gruparisan, error) {
 	obj.NamaGrup = req.NamaGrup
 	obj.Created = req.Now
 	obj.ID_Owner = req.ID_Owner
-	obj.ResultMoney = req.ResultMoney
 	obj.RulesMoney = req.RulesMoney
 
 	return &obj, nil
@@ -80,7 +77,6 @@ func (g *Gruparisan) UpdateMoneyUserGrup(reqRules int64, r *User) error {
 		return errorenum.MoneyMin
 	}
 	r.Money = r.Money - reqRules
-	g.ResultMoney = g.ResultMoney + reqRules
 	return nil
 
 }

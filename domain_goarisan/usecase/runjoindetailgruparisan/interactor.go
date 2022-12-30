@@ -38,7 +38,7 @@ func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req Inp
 		return nil, err
 	}
 	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
-
+	detailGrup.SetDetailGrup(grupObjs, req.ReqDetail)
 	if err := r.outport.SaveDetailGrupArisan(ctx, detailGrup); err != nil {
 		return nil, err
 	}

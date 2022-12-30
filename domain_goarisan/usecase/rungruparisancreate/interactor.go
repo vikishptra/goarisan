@@ -34,6 +34,7 @@ func (r *runGrupArisanCreateInteractor) Execute(ctx context.Context, req InportR
 		return nil, err
 	}
 	var RulesMoney = req.GruparisanCreateRequest.RulesMoney
+
 	grupObj.UpdateMoneyUserGrup(RulesMoney, userObjs)
 
 	if err := r.outport.SaveGrupArisan(ctx, grupObj); err != nil {
