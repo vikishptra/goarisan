@@ -2,6 +2,5 @@ POST http://localhost:8000/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614/grup
 
 { 
   "nama_grup":"testt",
-  "jumlah_users": 3,
-  "rules_money":2000
+  "rules_money":5000
 }

@@ -8,4 +8,5 @@ type Outport interface {
 	repository.FindGrupArisanByIdRepo
 	repository.FindGrupArisanByIdRepo
 	repository.SaveUserRepo
+	repository.SaveGrupArisanRepo
 }

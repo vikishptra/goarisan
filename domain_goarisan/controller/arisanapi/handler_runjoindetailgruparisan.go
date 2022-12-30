@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/model/vo"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/shared/gogen"
@@ -61,6 +62,11 @@ func (r *ginController) runJoinDetailGrupArisanHandler() gin.HandlerFunc {
 
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
+			if err == errorenum.DataNotFound {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
+				return
+			}
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return

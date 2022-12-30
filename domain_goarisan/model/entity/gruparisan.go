@@ -13,7 +13,6 @@ type Gruparisan struct {
 	Created     time.Time       `bson:"created" json:"created"`
 	NamaGrup    string          `json:"nama_grup"`
 	ID_Owner    vo.UserID       `uri:"id" json:"id_owner"`
-	JumlahUsers int64           `json:"jumlah_users"`
 	RulesMoney  int64           `json:"rules_money"`
 	ResultMoney int64           `json:"result_money"`
 }
@@ -53,7 +52,6 @@ func NewGruparisan(req GruparisanCreateRequest) (*Gruparisan, error) {
 	obj.NamaGrup = req.NamaGrup
 	obj.Created = req.Now
 	obj.ID_Owner = req.ID_Owner
-	obj.JumlahUsers = req.JumlahUsers
 	obj.ResultMoney = req.ResultMoney
 	obj.RulesMoney = req.RulesMoney
 
@@ -82,7 +80,7 @@ func (g *Gruparisan) UpdateMoneyUserGrup(reqRules int64, r *User) error {
 		return errorenum.MoneyMin
 	}
 	r.Money = r.Money - reqRules
-
+	g.ResultMoney = g.ResultMoney + reqRules
 	return nil
 
 }

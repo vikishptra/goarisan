@@ -37,12 +37,14 @@ func (r *runJoinDetailGrupArisanInteractor) Execute(ctx context.Context, req Inp
 	if err := detailGrup.ValidateGrupJoin(req.ReqDetail, userObjs, RulesMoney); err != nil {
 		return nil, err
 	}
+	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
 
 	if err := r.outport.SaveDetailGrupArisan(ctx, detailGrup); err != nil {
 		return nil, err
 	}
-	grupObjs.UpdateMoneyUserGrup(RulesMoney, userObjs)
-
+	if err := r.outport.SaveGrupArisan(ctx, grupObjs); err != nil {
+		return nil, err
+	}
 	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
 		return nil, err
 	}

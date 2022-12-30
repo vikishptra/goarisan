@@ -1,5 +1,5 @@
 POST http://localhost:8000/api/v1/user
 
 { 
-    "name":"vicky 123"
+    "name":"test 123"
 }
