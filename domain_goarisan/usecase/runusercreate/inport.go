@@ -12,5 +12,6 @@ type InportRequest struct {
 }
 
 type InportResponse struct {
-	Message string `json:"message"`
+	entity.UserCreateRequest
+	Message []any `json:"message"`
 }

@@ -2,6 +2,7 @@ package runuserupdate
 
 import (
 	"vikishptra/domain_goarisan/model/entity"
+	"vikishptra/domain_goarisan/model/vo"
 	"vikishptra/shared/gogen"
 )
 
@@ -12,5 +13,7 @@ type InportRequest struct {
 }
 
 type InportResponse struct {
-	Items *entity.User
+	ID      vo.UserID `json:"id"`
+	Nama    string    `json:"nama"`
+	Message []any     `json:"message"`
 }

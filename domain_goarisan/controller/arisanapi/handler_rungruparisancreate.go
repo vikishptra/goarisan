@@ -67,6 +67,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
+
 		jsonRes.Message = res.Message
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))

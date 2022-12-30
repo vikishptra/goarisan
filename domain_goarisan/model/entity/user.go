@@ -16,10 +16,10 @@ type User struct {
 }
 
 type UserCreateRequest struct {
-	RandomString string    `json:"-"`
-	Now          time.Time `json:"-"`
+	RandomString string    `json:"id"`
+	Now          time.Time `json:"time"`
 	Name         string    `json:"name"`
-	Money        int64     `json:"money"`
+	// Money        int64     `json:"money"`
 }
 
 func (r *User) ValidateUserCreate(req UserCreateRequest) error {

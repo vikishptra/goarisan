@@ -57,6 +57,9 @@ func (r *ginController) runUserCreateHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
+		jsonRes.Name = res.Name
+		jsonRes.Now = res.Now
+		jsonRes.RandomString = res.RandomString
 		jsonRes.Message = res.Message
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))

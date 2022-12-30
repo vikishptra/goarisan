@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"vikishptra/domain_goarisan/model/errorenum"
+	"vikishptra/shared/util"
 )
 
 type runUserUpdateInteractor struct {
@@ -34,7 +35,12 @@ func (r *runUserUpdateInteractor) Execute(ctx context.Context, req InportRequest
 		return nil, err
 	}
 
-	res.Items = userObjs
+	res.ID = userObjs.ID
+	res.Nama = userObjs.Name
+	message := []any{
+		"ok success update profile",
+	}
+	res.Message = util.ToSliceAny(message)
 
 	//!
 

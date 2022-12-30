@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"vikishptra/domain_goarisan/model/entity"
+	"vikishptra/shared/util"
 )
 
 type runUserCreateInteractor struct {
@@ -31,7 +32,13 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	if err := r.outport.SaveUser(ctx, todoObj); err != nil {
 		return nil, err
 	}
-	res.Message = "ok success"
+	res.Name = req.Name
+	res.Now = req.Now
+	res.RandomString = req.RandomString
+	message := []any{
+		"ok success create user",
+	}
+	res.Message = util.ToSliceAny(message)
 
 	return res, nil
 }

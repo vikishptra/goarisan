@@ -67,8 +67,9 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
-		jsonRes.Items = res.Items
-
+		jsonRes.ID = res.ID
+		jsonRes.Nama = res.Nama
+		jsonRes.Message = res.Message
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 
