@@ -99,7 +99,7 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup string) ([]ma
 	var detailGrupArisan entity.DetailGrupArisan
 	var result []map[string]any
 
-	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
+	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("status_user_arisan = 0 AND id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
 		return nil, errorenum.DataNotFound
 	}
 	users, _ := r.FindUserByID(ctx, detailGrupArisan.ID_User)
