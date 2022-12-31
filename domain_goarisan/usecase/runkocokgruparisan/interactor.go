@@ -20,6 +20,10 @@ func (r *runKocokGrupArisanInteractor) Execute(ctx context.Context, req InportRe
 
 	res := &InportResponse{}
 
+	if err := r.outport.FindOneGrupByOwner(ctx, req.IDUser, req.IDGrup); err != nil {
+		return nil, err
+	}
+
 	detailGrupObj, err := r.outport.FindUndianArisanUser(ctx, req.IDGrup)
 	if err != nil {
 		return nil, err

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
@@ -34,8 +35,15 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReqUri request
-		if err := c.BindUri(&jsonReqUri); err != nil {
+		var jsonReqBIND request
+		if err := c.Bind(&jsonReqBIND); err != nil {
+			r.log.Error(ctx, err.Error())
+			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
+			return
+		}
+
+		var jsonReqURI request
+		if err := c.BindUri(&jsonReqURI); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
@@ -43,12 +51,18 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 
 		var req InportRequest
 
-		req.IDGrup = jsonReqUri.IDGrup
+		req.IDGrup = jsonReqBIND.IDGrup
+		req.IDUser = jsonReqURI.IDUser
 
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
+			if err == errorenum.AndaBukanAdmin {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
+				return
+			}
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return

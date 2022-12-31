@@ -28,5 +28,9 @@ type FindGrupArisanByIdRepo interface {
 }
 
 type FindUndianArisanUserRepo interface {
-	FindUndianArisanUser(ctx context.Context, IDgrup string) ([]map[string]any, error)
+	FindUndianArisanUser(ctx context.Context, IDgrup vo.GruparisanID) ([]map[string]any, error)
+}
+
+type FindOneGrupByOwnerRepo interface {
+	FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error
 }
