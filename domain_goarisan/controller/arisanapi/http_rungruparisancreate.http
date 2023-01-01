@@ -1,6 +1,6 @@
 POST http://localhost:8002/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614/grup
 
 { 
-  "nama_grup":"grup 3",
-  "rules_money":10000
+  "nama_grup":"grup 1",
+  "rules_money":2000
 }
