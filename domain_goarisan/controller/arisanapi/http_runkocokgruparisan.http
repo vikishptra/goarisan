@@ -1,1 +1,1 @@
-POST http://localhost:8002/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614/arisan/grup/?id_grup=GRP-526883ce-b890-495f-b244-f1a4f7d592f3
+POST http://localhost:8002/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614/arisan/grup/?id_grup=GRP-202c7b2d-a654-4f47-b1f1-80886781a4cc

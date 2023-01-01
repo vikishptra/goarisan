@@ -97,8 +97,14 @@ func (r *Gateway) FindGrupArisanAndUserById(ctx context.Context, GrupArisanId vo
 
 func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.GruparisanID) ([]map[string]any, error) {
 	var detailGrupArisan entity.DetailGrupArisan
-
+	var MaxStatus, MoneyUser int64
 	var result []map[string]any
+
+	//menjumlahkan data uang dari grup arisan kalo 0 maka gabisa ngocok arisan
+	if err := r.FindSumMoneyByIDGrup(ctx, IDGrup, MoneyUser); err != nil {
+		return nil, err
+	}
+
 	//generate nilai random
 	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("status_user_putaran_arisan = 0 AND id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
 		return nil, errorenum.DataNotFound
@@ -109,7 +115,7 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 	//pindahin ke result dengan tipe map
 	result = append(result, map[string]any{"id_user": detailGrupArisan.ID_User, "no_undian": detailGrupArisan.No_undian, "name": users.Name})
 
-	var MaxStatus int64
+	//mengambil data max dari status user by id grup
 	if err := r.Db.Model(&entity.DetailGrupArisan{}).Select("MAX(status_user_putaran_arisan)").Where("id_detail_grup = ?", IDGrup).Row().Scan(&MaxStatus); err != nil {
 		return nil, errorenum.SomethingError
 	}
@@ -119,14 +125,9 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 		return nil, err.Error
 	}
 
-	//select uang money dari money by grup
-	var MoneyUser int64
-	if err := r.Db.Model(entity.DetailGrupArisan{}).Select("SUM(money)").Where("id_detail_grup = ?", IDGrup).Row().Scan(&MoneyUser); err != nil {
-		return nil, errorenum.SomethingError
-	}
 	//update money
-	users.Money = users.Money + MoneyUser
-	if err := r.Db.Model(entity.User{}).Where("id = ?", detailGrupArisan.ID_User).Update("money", users.Money); err.Error != nil {
+	MoneyUser = users.Money + MoneyUser
+	if err := r.Db.Model(entity.User{}).Where("id = ?", detailGrupArisan.ID_User).Update("money", MoneyUser); err.Error != nil {
 		return nil, err.Error
 	}
 
@@ -139,10 +140,57 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 
 func (r *Gateway) FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error {
 
-	if err := r.Db.Model(entity.Gruparisan{}).Where("id = ? AND id_owner = ? ", IDGrup, IDUser); err.Error != nil {
+	var gruparisan entity.Gruparisan
+
+	if err := r.Db.First(&gruparisan, "id_owner = ?", IDUser).First(&gruparisan, "id = ?", IDGrup); err.RecordNotFound() {
 		return errorenum.AndaBukanAdmin
 	}
 
 	return nil
 
+}
+
+func (r *Gateway) FindSumMoneyByIDGrup(ctx context.Context, IDGrup vo.GruparisanID, MoneyUser int64) error {
+
+	if err := r.Db.Model(&entity.DetailGrupArisan{}).Select("SUM(money)").Where("id_detail_grup = ?", IDGrup).Row().Scan(&MoneyUser); err != nil {
+		return errorenum.SomethingError
+	}
+
+	grupObj, err := r.FindGrupByID(ctx, IDGrup)
+	if err != nil {
+		return err
+	}
+
+	CountUser, err := r.CountDetailGrupByID(ctx, IDGrup)
+	if err != nil {
+		return err
+	}
+
+	test := (CountUser * grupObj.RulesMoney) - 1
+
+	if MoneyUser < test {
+		return errorenum.AnggotaGrupAndaMasihAdaYangBelumSetoran
+	}
+	return nil
+}
+
+func (r *Gateway) CountDetailGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (int64, error) {
+	var CountUser int64
+	if err := r.Db.Model(&entity.DetailGrupArisan{}).Select("COUNT(status_user_putaran_arisan)").Where("id_detail_grup = ?", IDGrup).Row().Scan(&CountUser); err != nil {
+		return 0, errorenum.SomethingError
+	}
+
+	return CountUser, nil
+
+}
+
+func (r *Gateway) FindGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (*entity.Gruparisan, error) {
+
+	var gruparisan entity.Gruparisan
+
+	if err := r.Db.First(&gruparisan, "id = ?", IDGrup); err.RecordNotFound() {
+		return nil, errorenum.SomethingError
+	}
+
+	return &gruparisan, nil
 }
