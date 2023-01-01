@@ -10,13 +10,13 @@ import (
 )
 
 type DetailGrupArisan struct {
-	ID               vo.DetailGrupArisanID `bson:"_id" json:"id"`
-	ID_Detail_Grup   vo.GruparisanID       `json:"id_detail_grup" uri:"id"`
-	ID_User          vo.UserID             `json:"id_user" uri:"id"`
-	StatusUserArisan bool                  `bson:"status_user_arisan"`
-	Money            int64                 `json:"money"`
-	No_undian        int                   `json:"no_undian"`
-	Created          time.Time             `bson:"created" json:"created"`
+	ID                      vo.DetailGrupArisanID `bson:"_id" json:"id"`
+	ID_Detail_Grup          vo.GruparisanID       `json:"id_detail_grup" uri:"id"`
+	ID_User                 vo.UserID             `json:"id_user" uri:"id"`
+	StatusUserPutaranArisan int64                 `bson:"status_user_arisan"`
+	Money                   int64                 `json:"money"`
+	No_undian               int                   `json:"no_undian"`
+	Created                 time.Time             `bson:"created" json:"created"`
 }
 
 type DetailGrupArisanCreateRequest struct {
