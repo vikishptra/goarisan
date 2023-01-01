@@ -189,7 +189,7 @@ func (r *Gateway) FindGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (*en
 	var gruparisan entity.Gruparisan
 
 	if err := r.Db.First(&gruparisan, "id = ?", IDGrup); err.RecordNotFound() {
-		return nil, errorenum.SomethingError
+		return nil, errorenum.DataNotFound
 	}
 
 	return &gruparisan, nil
