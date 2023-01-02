@@ -9,8 +9,9 @@ import (
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	IDGrup vo.GruparisanID `form:"id_grup"`
-	IDUser vo.UserID       `uri:"id"`
+	IDGrup   vo.GruparisanID `form:"id_grup"`
+	IDUser   vo.UserID       `uri:"id"`
+	JwtToken vo.UserID       `uri:"id"`
 	entity.DetailGrupArisan
 }
 

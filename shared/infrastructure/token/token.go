@@ -1,80 +1,84 @@
 package token
 
 import (
-	"encoding/base64"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+
+	"vikishptra/domain_goarisan/model/vo"
+	"vikishptra/shared/util"
 )
 
-type JWTToken interface {
-	// CreateToken create a token with a content
-	CreateToken(content []byte, expired time.Duration) (string, error)
+func GenerateToken(user_id vo.UserID) (string, error) {
 
-	// VerifyToken verify and return the content
-	VerifyToken(tokenString string) ([]byte, error)
-}
+	token_lifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
 
-const fieldContent = "content"
-
-type jwtToken struct {
-	secretKey string
-}
-
-func NewJWTToken(secretKey string) JWTToken {
-	return &jwtToken{secretKey: secretKey}
-}
-
-func (j jwtToken) CreateToken(content []byte, expired time.Duration) (string, error) {
-
-	contentBase64 := base64.StdEncoding.EncodeToString(content)
-
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        time.Now().Add(expired).Unix(),
-		fieldContent: contentBase64,
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(j.secretKey))
 	if err != nil {
 		return "", err
 	}
 
-	return tokenString, nil
+	claims := jwt.MapClaims{}
+	claims["authorized"] = true
+	claims["user_id"] = user_id
+	claims["uuid"] = util.GenerateID()
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(os.Getenv("API_SECRET")))
 
 }
 
-func (j jwtToken) VerifyToken(tokenString string) ([]byte, error) {
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
+func TokenValid(c *gin.Context) error {
+	tokenString := ExtractToken(c)
+	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte(j.secretKey), nil
+		return []byte(os.Getenv("API_SECRET")), nil
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
+	return nil
+}
 
-	if !token.Valid {
-		return nil, fmt.Errorf("token is not valid")
+func ExtractToken(c *gin.Context) string {
+	token := c.Query("token")
+	if token != "" {
+		return token
 	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return nil, fmt.Errorf("claims is can not asserted")
+	bearerToken := c.Request.Header.Get("Authorization")
+	if len(strings.Split(bearerToken, " ")) == 2 {
+		return strings.Split(bearerToken, " ")[1]
 	}
+	return ""
+}
 
-	decodeStringInBytes, err := base64.StdEncoding.DecodeString(claims[fieldContent].(string))
+func ExtractTokenID(c *gin.Context) (vo.UserID, error) {
+
+	tokenString := ExtractToken(c)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("API_SECRET")), nil
+	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		uid := fmt.Sprintf("%s", claims["user_id"])
 
-	return decodeStringInBytes, nil
+		if err != nil {
+			return "", err
+		}
+		return vo.UserID(uid), nil
+	}
+	return "", nil
 }

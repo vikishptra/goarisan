@@ -10,13 +10,13 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
-	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/model/entity"
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/model/vo"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/config"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 )
 
 type Gateway struct {
@@ -117,7 +117,8 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 	var result []map[string]any
 
 	//menjumlahkan data uang dari grup arisan kalo 0 maka gabisa ngocok arisan
-	if err := r.FindSumMoneyByIDGrup(ctx, IDGrup, MoneyUser); err != nil {
+	MoneyUser, err := r.FindSumMoneyByIDGrup(ctx, IDGrup, MoneyUser)
+	if err != nil {
 		return nil, err
 	}
 
@@ -166,28 +167,28 @@ func (r *Gateway) FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGr
 
 }
 
-func (r *Gateway) FindSumMoneyByIDGrup(ctx context.Context, IDGrup vo.GruparisanID, MoneyUser int64) error {
+func (r *Gateway) FindSumMoneyByIDGrup(ctx context.Context, IDGrup vo.GruparisanID, MoneyUser int64) (int64, error) {
 
 	if err := r.Db.Model(&entity.DetailGrupArisan{}).Select("SUM(money)").Where("id_detail_grup = ?", IDGrup).Row().Scan(&MoneyUser); err != nil {
-		return errorenum.SomethingError
+		return 0, errorenum.SomethingError
 	}
 
 	grupObj, err := r.FindGrupByID(ctx, IDGrup)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	CountUser, err := r.CountDetailGrupByID(ctx, IDGrup)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	test := (CountUser * grupObj.RulesMoney) - 1
 
 	if MoneyUser < test {
-		return errorenum.AnggotaGrupAndaMasihAdaYangBelumSetoran
+		return 0, errorenum.AnggotaGrupAndaMasihAdaYangBelumSetoran
 	}
-	return nil
+	return MoneyUser, nil
 }
 
 func (r *Gateway) CountDetailGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (int64, error) {

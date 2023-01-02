@@ -7,11 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
@@ -36,7 +36,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 		traceID := util.GenerateID()
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
-		token, _ := token.ExtractTokenID(c)
+		id, _ := token.ExtractTokenID(c)
 
 		var jsonReqUri request
 		if err := c.BindUri(&jsonReqUri); err != nil {
@@ -50,8 +50,9 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
+
 		var req InportRequest
-		req.JwtToken = token
+		req.JwtToken = id
 		req.ID_Owner = jsonReqUri.ID_Owner
 		req.NamaGrup = jsonReq.NamaGrup
 		req.RulesMoney = jsonReq.RulesMoney

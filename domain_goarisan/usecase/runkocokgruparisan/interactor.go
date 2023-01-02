@@ -28,6 +28,11 @@ func (r *runKocokGrupArisanInteractor) Execute(ctx context.Context, req InportRe
 	if err != nil {
 		return nil, err
 	}
+
+	if err := req.ValidateTokenUser(req.IDUser, req.JwtToken); err != nil {
+		return nil, err
+	}
+
 	res.Items = util.ToSliceAny(detailGrupObj)
 
 	return res, nil

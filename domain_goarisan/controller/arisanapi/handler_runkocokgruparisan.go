@@ -10,6 +10,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
@@ -36,6 +37,8 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var jsonReqBIND request
+		id, _ := token.ExtractTokenID(c)
+
 		if err := c.Bind(&jsonReqBIND); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
@@ -53,7 +56,7 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 
 		req.IDGrup = jsonReqBIND.IDGrup
 		req.IDUser = jsonReqURI.IDUser
-
+		req.JwtToken = id
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
@@ -41,16 +40,6 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
-		//meriksa cookie token dan auth token
-		var access_token string
-		getAuth := token.ExtractToken(c)
-		cookie, _ := c.Cookie("token")
-		access_token = cookie
-		if access_token != getAuth || access_token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"success": "false", "message": "Anda belum login"})
-			return
-		}
-		//
 
 		//ubah token menjadi nulll
 		domain := os.Getenv("DOMAIN")

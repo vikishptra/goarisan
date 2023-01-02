@@ -12,6 +12,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
@@ -39,6 +40,8 @@ func (r *ginController) runJoinDetailGrupArisanHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var jsonReqURI request
+		id, _ := token.ExtractTokenID(c)
+
 		if err := c.BindUri(&jsonReqURI); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
@@ -57,6 +60,7 @@ func (r *ginController) runJoinDetailGrupArisanHandler() gin.HandlerFunc {
 		req.ReqDetail.ID_User = jsonReqURI.ReqDetail.ID_User
 		req.ReqDetail.RandomString = util.GenerateID()
 		req.ReqDetail.Now = time.Now()
+		req.ReqGrup.JwtToken = id
 
 		r.log.Info(ctx, util.MustJSON(req))
 

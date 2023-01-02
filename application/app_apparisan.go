@@ -18,7 +18,6 @@ import (
 	"vikishptra/shared/infrastructure/config"
 	"vikishptra/shared/infrastructure/logger"
 	"vikishptra/shared/infrastructure/server"
-	"vikishptra/shared/infrastructure/token"
 )
 
 type apparisan struct{}
@@ -37,13 +36,11 @@ func (apparisan) Run() error {
 
 	log := logger.NewSimpleJSONLogger(appData)
 
-	jwtToken := token.NewJWTToken(cfg.JWTSecretKey)
-
 	datasource := withgorm.NewGateway(log, appData, cfg)
 
 	httpHandler := server.NewGinHTTPHandler(log, cfg.Servers[appName].Address, appData)
 
-	x := arisanapi.NewGinController(log, cfg, jwtToken)
+	x := arisanapi.NewGinController(log, cfg)
 	x.AddUsecase(
 		//
 		runlogoutuser.NewUsecase(datasource),

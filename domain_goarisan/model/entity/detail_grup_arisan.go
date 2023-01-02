@@ -26,7 +26,7 @@ type DetailGrupArisanCreateRequest struct {
 	ID_User        vo.UserID       `json:"id_user" uri:"id"`
 	RulesMoney     int64           `json:"money"`
 	StatusUser     bool            `bson:"status_user_arisan"`
-	JwtToken       vo.UserID       `json:"json"`
+	JwtToken       vo.UserID       `json:"-"`
 }
 
 type DetailGrupArisanUpdateRequest struct {
@@ -48,6 +48,7 @@ func JoinGrupArisan(req DetailGrupArisanCreateRequest) (*DetailGrupArisan, error
 	return &Gruparisan, nil
 }
 func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest, reqUser *User, uang int64) error {
+
 	if reqUser.Money == 0 {
 		return errorenum.MoneyMin
 	} else if strings.TrimSpace(string(req.ID_Detail_Grup)) == "" || strings.TrimSpace(string(req.ID_User)) == "" {
@@ -58,9 +59,11 @@ func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest, r
 	return nil
 }
 
-func (r *DetailGrupArisan) Update(req DetailGrupArisanUpdateRequest) error {
+func (r *DetailGrupArisan) ValidateTokenUser(IDowner, jwtToken vo.UserID) error {
 
-	// add validation and assignment value here ...
+	if IDowner != vo.UserID(jwtToken) {
+		return errorenum.HayoMauNgapain
+	}
 
 	return nil
 }
@@ -76,7 +79,7 @@ func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupAris
 	r.ID_User = reqUser.ID
 	r.Created = req.Created
 	r.Money = req.RulesMoney
-	r.No_undian = rand.Intn(100)
+	r.No_undian = rand.Intn(200)
 	return r, nil
 
 }

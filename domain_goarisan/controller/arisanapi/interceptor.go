@@ -5,42 +5,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/controller/arisanapi/token"
+	"vikishptra/shared/infrastructure/token"
 )
 
-func (r *ginController) authentication() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		// tokenInBytes, err := r.JwtToken.VerifyToken(c.GetHeader("token"))
-		// if err != nil {
-		// 	c.AbortWithStatus(http.StatusForbidden)
-		// 	return
-		// }
-		//
-		// var dataToken payload.DataToken
-		// err = json.Unmarshal(tokenInBytes, &dataToken)
-		// if err != nil {
-		// 	c.AbortWithStatus(http.StatusForbidden)
-		// 	return
-		// }
-		//
-		// c.Set("data", dataToken)
-		//
-		// c.AbortWithStatus(http.StatusForbidden)
-		// return
-
-	}
-}
-
-func (r *ginController) authorization() gin.HandlerFunc {
+func (r *ginController) AuthMid() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		err := token.TokenValid(c)
-		if err != nil {
+		//meriksa cookie token dan auth token
+		var access_token string
+		getAuth := token.ExtractToken(c)
+		cookie, _ := c.Cookie("token")
+		access_token = cookie
+		if access_token != getAuth || access_token == "" {
 			c.String(http.StatusUnauthorized, "Unauthorized")
 			c.Abort()
 			return
 		}
-		c.Next()
+
 	}
+
 }
