@@ -11,4 +11,7 @@ const (
 	UserAlreadyJoin                         apperror.ErrorType = "ER0005 user already join"
 	AndaBukanAdmin                          apperror.ErrorType = "ER0006 anda bukan admin"
 	AnggotaGrupAndaMasihAdaYangBelumSetoran apperror.ErrorType = "ER0007 anggota grup anda masih ada yang belum setoran"
+	UsernameAtauPasswordAndaSalah           apperror.ErrorType = "ER0008 username atau password anda salah"
+	UsernameTidakDiTemukan                  apperror.ErrorType = "ER0009 username tidak di temukan"
+	HayoMauNgapain                          apperror.ErrorType = "ER0010 hayo mau ngapain"
 )

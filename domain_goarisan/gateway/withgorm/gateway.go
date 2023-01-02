@@ -2,10 +2,15 @@ package withgorm
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 
+	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/model/entity"
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/model/vo"
@@ -23,15 +28,26 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	Db, err := gorm.Open("mysql", "root:@tcp(localhost:3306)/arisan?charset=utf8&parseTime=True")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
+
+	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	Db, err := gorm.Open("mysql", DBURL)
 
 	if err != nil {
 		panic(err)
 	}
 	err = Db.AutoMigrate(entity.User{}, entity.Gruparisan{}, entity.DetailGrupArisan{}).Error
-	Db.Model(entity.Gruparisan{}).AddForeignKey("id_owner", "users(id)", "CASCADE", "CASCADE")                   // Foreign key need to define manually
-	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_detail_grup", "gruparisans(id)", "CASCADE", "CASCADE") // Foreign key need to define manually
-	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_user", "users(id)", "CASCADE", "CASCADE")              // Foreign key need to define manually
+	Db.Model(entity.Gruparisan{}).AddForeignKey("id_owner", "users(id)", "CASCADE", "CASCADE")
+	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_detail_grup", "gruparisans(id)", "CASCADE", "CASCADE")
+	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_user", "users(id)", "CASCADE", "CASCADE")
 
 	if err != nil {
 		panic(err)
@@ -193,4 +209,25 @@ func (r *Gateway) FindGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (*en
 	}
 
 	return &gruparisan, nil
+}
+
+func (r *Gateway) RunLogin(ctx context.Context, username, password string) (string, *entity.User, error) {
+	var user entity.User
+	var UserPassword *entity.User
+	if err := r.Db.Model(&user).Where("name = ?", username).Take(&user); err.Error != nil {
+		return "", nil, errorenum.UsernameAtauPasswordAndaSalah
+	}
+
+	err := UserPassword.VerifyPassword(password, user.Password)
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		return "", nil, errorenum.UsernameAtauPasswordAndaSalah
+	}
+	//dapat token
+	token, err := token.GenerateToken(user.ID)
+
+	if err != nil {
+		return "", nil, err
+	}
+
+	return token, &user, nil
 }

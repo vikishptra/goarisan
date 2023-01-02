@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"vikishptra/domain_goarisan/controller/arisanapi/token"
 )
 
 func (r *ginController) authentication() gin.HandlerFunc {
@@ -33,12 +35,12 @@ func (r *ginController) authentication() gin.HandlerFunc {
 func (r *ginController) authorization() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-
-		authorized := true
-
-		if !authorized {
-			c.AbortWithStatus(http.StatusForbidden)
+		err := token.TokenValid(c)
+		if err != nil {
+			c.String(http.StatusUnauthorized, "Unauthorized")
+			c.Abort()
 			return
 		}
+		c.Next()
 	}
 }

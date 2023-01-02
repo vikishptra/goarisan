@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
 	"vikishptra/shared/gogen"
@@ -36,12 +37,13 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var jsonReq request
+		token, _ := token.ExtractTokenID(c)
+
 		if err := c.BindUri(&jsonReq); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
-
 		var jsonReqJSON request
 		if err := c.BindJSON(&jsonReqJSON); err != nil {
 			r.log.Error(ctx, err.Error())
@@ -51,6 +53,7 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 
 		var req InportRequest
 		req.ID = jsonReq.ID
+		req.Jwt = token
 		req.Name = jsonReqJSON.Name
 
 		r.log.Info(ctx, util.MustJSON(req))
@@ -60,6 +63,9 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 			r.log.Error(ctx, err.Error())
 			if err == errorenum.DataNotFound {
 				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
+				return
+			} else if err == errorenum.HayoMauNgapain {
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
 				return
 			}
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))

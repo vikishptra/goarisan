@@ -1,4 +1,4 @@
-PUT  http://localhost:8000/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614
+PUT  http://localhost:8002/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614
 
 {
     "name" : "update 4"

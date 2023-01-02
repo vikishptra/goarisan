@@ -34,3 +34,7 @@ type FindUndianArisanUserRepo interface {
 type FindOneGrupByOwnerRepo interface {
 	FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error
 }
+
+type RunLoginRepo interface {
+	RunLogin(ctx context.Context, username, password string) (string, *entity.User, error)
+}

@@ -35,6 +35,7 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	res.Name = req.Name
 	res.Now = req.Now
 	res.RandomString = req.RandomString
+	res.Password = "-"
 	message := []any{
 		"ok success create user",
 	}

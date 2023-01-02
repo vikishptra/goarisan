@@ -3,7 +3,6 @@ package runuserupdate
 import (
 	"context"
 
-	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/shared/util"
 )
 
@@ -28,7 +27,7 @@ func (r *runUserUpdateInteractor) Execute(ctx context.Context, req InportRequest
 		return nil, err
 	}
 	if err := userObjs.Update(req.UserUpdateRequest); err != nil {
-		return nil, errorenum.MessageNotEmpty
+		return nil, err
 	}
 
 	if err := r.outport.SaveUser(ctx, userObjs); err != nil {
