@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"vikishptra/domain_goarisan/controller/arisanapi/token"
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/shared/gogen"
@@ -35,6 +36,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 		traceID := util.GenerateID()
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
+		token, _ := token.ExtractTokenID(c)
 
 		var jsonReqUri request
 		if err := c.BindUri(&jsonReqUri); err != nil {
@@ -49,6 +51,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 			return
 		}
 		var req InportRequest
+		req.JwtToken = token
 		req.ID_Owner = jsonReqUri.ID_Owner
 		req.NamaGrup = jsonReq.NamaGrup
 		req.RulesMoney = jsonReq.RulesMoney
@@ -63,6 +66,9 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 			if err == errorenum.DataNotFound {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
+				return
+			} else if err == errorenum.HayoMauNgapain {
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
 				return
 			}
 			r.log.Error(ctx, err.Error())

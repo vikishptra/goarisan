@@ -23,11 +23,13 @@ type GruparisanCreateRequest struct {
 	NamaGrup     string    `json:"nama_grup"`
 	JumlahUsers  int64     `json:"jumlah_users"`
 	RulesMoney   int64     `json:"rules_money"`
+	JwtToken     vo.UserID `json:"json"`
 }
 
 func (r *Gruparisan) ValidateGrupCreate(req GruparisanCreateRequest, reqUser *User) error {
-
-	if reqUser.Money == 0 {
+	if req.ID_Owner != vo.UserID(req.JwtToken) {
+		return errorenum.HayoMauNgapain
+	} else if reqUser.Money == 0 {
 		return errorenum.MoneyMin
 	} else if strings.TrimSpace(req.NamaGrup) == "" {
 		return errorenum.MessageNotEmpty

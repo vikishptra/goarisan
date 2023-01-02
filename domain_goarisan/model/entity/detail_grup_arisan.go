@@ -26,6 +26,7 @@ type DetailGrupArisanCreateRequest struct {
 	ID_User        vo.UserID       `json:"id_user" uri:"id"`
 	RulesMoney     int64           `json:"money"`
 	StatusUser     bool            `bson:"status_user_arisan"`
+	JwtToken       vo.UserID       `json:"json"`
 }
 
 type DetailGrupArisanUpdateRequest struct {
