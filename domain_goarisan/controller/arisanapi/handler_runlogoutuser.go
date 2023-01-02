@@ -41,15 +41,18 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
-
+		//meriksa cookie token dan auth token
 		var access_token string
 		getAuth := token.ExtractToken(c)
 		cookie, _ := c.Cookie("token")
 		access_token = cookie
 		if access_token != getAuth || access_token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Anda belum login"})
+			c.JSON(http.StatusUnauthorized, gin.H{"success": "false", "message": "Anda belum login"})
 			return
 		}
+		//
+
+		//ubah token menjadi nulll
 		domain := os.Getenv("DOMAIN")
 		c.SetCookie("token", "", -1, "/", domain, false, true)
 		c.SetCookie("logged_in", "", -1, "/", domain, false, true)

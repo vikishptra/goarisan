@@ -51,6 +51,7 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 			return
 		}
 
+		//meriksa cookie token dan auth token
 		var access_token string
 		getAuth := token.ExtractToken(c)
 		cookie, _ := c.Cookie("token")
@@ -59,6 +60,7 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Anda belum login"})
 			return
 		}
+		///
 
 		var req InportRequest
 		req.ID = jsonReq.ID
