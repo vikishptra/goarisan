@@ -1,11 +1,16 @@
 package application
 
 import (
+	"os"
+
+	"github.com/gin-contrib/cors"
+
 	"vikishptra/domain_goarisan/controller/arisanapi"
 	"vikishptra/domain_goarisan/gateway/withgorm"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
+	"vikishptra/domain_goarisan/usecase/runlogoutuser"
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
@@ -41,6 +46,7 @@ func (apparisan) Run() error {
 	x := arisanapi.NewGinController(log, cfg, jwtToken)
 	x.AddUsecase(
 		//
+		runlogoutuser.NewUsecase(datasource),
 		runuserlogin.NewUsecase(datasource),
 		runkocokgruparisan.NewUsecase(datasource),
 		runjoindetailgruparisan.NewUsecase(datasource),
@@ -51,6 +57,13 @@ func (apparisan) Run() error {
 	)
 	x.RegisterRouter(httpHandler.Router)
 
+	corsConfig := cors.DefaultConfig()
+	Origin := os.Getenv("ORIGIN")
+	OriginUrl := Origin
+	corsConfig.AllowOrigins = []string{OriginUrl}
+	corsConfig.AllowCredentials = true
+
+	httpHandler.Router.Use(cors.New(corsConfig))
 	httpHandler.RunWithGracefullyShutdown()
 
 	return nil

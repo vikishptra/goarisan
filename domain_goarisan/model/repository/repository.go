@@ -38,3 +38,7 @@ type FindOneGrupByOwnerRepo interface {
 type RunLoginRepo interface {
 	RunLogin(ctx context.Context, username, password string) (string, *entity.User, error)
 }
+
+type RunLogoutRepo interface {
+	DeleteAuth(s []string, r string) []string
+}

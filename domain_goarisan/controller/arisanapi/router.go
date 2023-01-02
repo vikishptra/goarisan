@@ -39,4 +39,5 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.POST("/user/:id/grup", r.authorization(), r.runGrupArisanCreateHandler())
 	resource.POST("/user/:id/join/grup", r.authorization(), r.runJoinDetailGrupArisanHandler())
 	resource.POST("/user/:id/arisan/grup/", r.authorization(), r.runKocokGrupArisanHandler())
+	resource.POST("/user/logout", r.authorization(), r.runLogoutUserHandler())
 }

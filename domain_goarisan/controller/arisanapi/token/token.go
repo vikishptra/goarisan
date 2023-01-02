@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt"
 
 	"vikishptra/domain_goarisan/model/vo"
+	"vikishptra/shared/util"
 )
 
 func GenerateToken(user_id vo.UserID) (string, error) {
@@ -24,6 +25,7 @@ func GenerateToken(user_id vo.UserID) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["user_id"] = user_id
+	claims["uuid"] = util.GenerateID()
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(token_lifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
@@ -72,6 +74,7 @@ func ExtractTokenID(c *gin.Context) (vo.UserID, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		uid := fmt.Sprintf("%s", claims["user_id"])
+
 		if err != nil {
 			return "", err
 		}

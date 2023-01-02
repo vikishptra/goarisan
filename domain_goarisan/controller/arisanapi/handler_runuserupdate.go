@@ -37,7 +37,7 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var jsonReq request
-		token, _ := token.ExtractTokenID(c)
+		id, _ := token.ExtractTokenID(c)
 
 		if err := c.BindUri(&jsonReq); err != nil {
 			r.log.Error(ctx, err.Error())
@@ -51,9 +51,18 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 			return
 		}
 
+		var access_token string
+		getAuth := token.ExtractToken(c)
+		cookie, _ := c.Cookie("token")
+		access_token = cookie
+		if access_token != getAuth || access_token == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Anda belum login"})
+			return
+		}
+
 		var req InportRequest
 		req.ID = jsonReq.ID
-		req.Jwt = token
+		req.Jwt = id
 		req.Name = jsonReqJSON.Name
 
 		r.log.Info(ctx, util.MustJSON(req))

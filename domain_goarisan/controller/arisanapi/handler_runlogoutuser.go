@@ -7,23 +7,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/usecase/runuserlogin"
+	"vikishptra/domain_goarisan/controller/arisanapi/token"
+	"vikishptra/domain_goarisan/usecase/runlogoutuser"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
 
-func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
+func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 
-	type InportRequest = runuserlogin.InportRequest
-	type InportResponse = runuserlogin.InportResponse
+	type InportRequest = runlogoutuser.InportRequest
+	type InportResponse = runlogoutuser.InportResponse
 
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
-
-	type request struct {
-		InportRequest
-	}
 
 	type response struct {
 		InportResponse
@@ -35,19 +32,9 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReq request
-		if err := c.BindJSON(&jsonReq); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
-
 		var req InportRequest
-		req.Name = jsonReq.Name
-		req.Password = jsonReq.Password
 
 		r.log.Info(ctx, util.MustJSON(req))
-
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
 			r.log.Error(ctx, err.Error())
@@ -55,17 +42,20 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 			return
 		}
 
-		var jsonRes response
-		jsonRes.Name = res.Name
-		jsonRes.Token = res.Token
-		jsonRes.Password = res.Password
-		jsonRes.Now = res.Now
-		jsonRes.RandomString = res.RandomString
+		var access_token string
+		getAuth := token.ExtractToken(c)
+		cookie, _ := c.Cookie("token")
+		access_token = cookie
+		if access_token != getAuth || access_token == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"status": "fail", "message": "Anda belum login"})
+			return
+		}
 		domain := os.Getenv("DOMAIN")
+		c.SetCookie("token", "", -1, "/", domain, false, true)
+		c.SetCookie("logged_in", "", -1, "/", domain, false, true)
 
-		c.SetCookie("token", jsonRes.Token, 15*60, "/", domain, false, true)
-		c.SetCookie("logged_in", "true", 15*60, "/", domain, false, false)
-
+		var jsonRes response
+		jsonRes.Message = res.Message
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 
