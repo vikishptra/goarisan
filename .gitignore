@@ -1,6 +1,5 @@
 .idea/
 .DS_Store
-.env
 *.app
 *.exe
 *.log
