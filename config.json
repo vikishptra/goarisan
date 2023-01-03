@@ -1,0 +1,17 @@
+{
+  "database": {
+    "database": "",
+    "host": "",
+    "password": "",
+    "port": 0,
+    "username": ""
+  },
+  "server": {
+    "port": 8080
+  },
+  "servers": {
+    "apparisan": {
+      "address": ":8002"
+    }
+  }
+}
