@@ -155,13 +155,13 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 	return result, nil
 }
 
-func (r *Gateway) FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error {
-
-	if err := r.Db.Where("id_owner = ? AND id = ?", IDUser, IDGrup).Find(&entity.Gruparisan{}); err.RecordNotFound() {
-		return errorenum.AndaBukanAdmin
+func (r *Gateway) FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) (*entity.Gruparisan, error) {
+	var grup entity.Gruparisan
+	if err := r.Db.Where("id_owner = ? AND id = ?", IDUser, IDGrup).Find(&grup); err.RecordNotFound() {
+		return nil, errorenum.AndaBukanAdmin
 	}
 
-	return nil
+	return &grup, nil
 
 }
 

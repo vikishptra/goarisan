@@ -58,12 +58,24 @@ func NewGruparisan(req GruparisanCreateRequest) (*Gruparisan, error) {
 }
 
 type GruparisanUpdateRequest struct {
-	// add field to update here ...
+	IDUser     vo.UserID `uri:"id"`
+	JwtToken   vo.UserID
+	IDGrup     vo.GruparisanID `uri:"grup"`
+	NamaGrup   string          `json:"nama_grup"`
+	RulesMoney int64           `json:"rules_money"`
 }
 
 func (r *Gruparisan) Update(req GruparisanUpdateRequest) error {
 
-	// add validation and assignment value here ...
+	if req.IDUser != req.JwtToken {
+		return errorenum.HayoMauNgapain
+	} else if strings.TrimSpace(req.NamaGrup) == "" {
+		return errorenum.MessageNotEmpty
+	} else if int(req.RulesMoney) < 0 {
+		return errorenum.RulesMoneyTidakBolehKurangDari0
+	}
+	r.NamaGrup = req.NamaGrup
+	r.RulesMoney = req.RulesMoney
 
 	return nil
 }

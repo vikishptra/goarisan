@@ -32,7 +32,7 @@ type FindUndianArisanUserRepo interface {
 }
 
 type FindOneGrupByOwnerRepo interface {
-	FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error
+	FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) (*entity.Gruparisan, error)
 }
 
 type RunLoginRepo interface {

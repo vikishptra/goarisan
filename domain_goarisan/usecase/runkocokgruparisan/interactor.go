@@ -20,7 +20,7 @@ func (r *runKocokGrupArisanInteractor) Execute(ctx context.Context, req InportRe
 
 	res := &InportResponse{}
 
-	if err := r.outport.FindOneGrupByOwner(ctx, req.IDUser, req.IDGrup); err != nil {
+	if _, err := r.outport.FindOneGrupByOwner(ctx, req.IDUser, req.IDGrup); err != nil {
 		return nil, err
 	}
 	if err := req.ValidateTokenUser(req.IDUser, req.JwtToken); err != nil {

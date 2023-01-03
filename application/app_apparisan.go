@@ -12,6 +12,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
+	"vikishptra/domain_goarisan/usecase/runupdategruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/runupdateusermoney"
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
@@ -45,6 +46,7 @@ func (apparisan) Run() error {
 	x := arisanapi.NewGinController(log, cfg)
 	x.AddUsecase(
 		//
+		runupdategruparisanbyidowner.NewUsecase(datasource),
 		runupdateusermoney.NewUsecase(datasource),
 		findoneuserbyid.NewUsecase(datasource),
 		runlogoutuser.NewUsecase(datasource),

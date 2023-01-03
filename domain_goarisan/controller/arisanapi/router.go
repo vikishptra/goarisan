@@ -38,4 +38,5 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.POST("/user/logout", r.runLogoutUserHandler())
 	resource.GET("/user/:id", r.findOneUserByIDHandler())
 	resource.PUT("/user/:id/money", r.runupdateusermoneyHandler())
+	resource.PUT("/user/:id/grup/:grup", r.runupdategruparisanbyidownerHandler())
 }
