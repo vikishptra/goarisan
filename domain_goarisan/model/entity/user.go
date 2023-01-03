@@ -42,6 +42,14 @@ func (r *User) ValidateUserCreate(req UserCreateRequest) error {
 	return nil
 
 }
+func (r *User) ValidateTokenUser(IDUser, jwtToken vo.UserID) error {
+
+	if IDUser != vo.UserID(jwtToken) {
+		return errorenum.HayoMauNgapain
+	}
+
+	return nil
+}
 
 func NewUser(req UserCreateRequest) (*User, error) {
 

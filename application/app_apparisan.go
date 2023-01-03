@@ -7,6 +7,7 @@ import (
 
 	"vikishptra/domain_goarisan/controller/arisanapi"
 	"vikishptra/domain_goarisan/gateway/withgorm"
+	"vikishptra/domain_goarisan/usecase/findoneuserbyid"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
@@ -43,6 +44,7 @@ func (apparisan) Run() error {
 	x := arisanapi.NewGinController(log, cfg)
 	x.AddUsecase(
 		//
+		findoneuserbyid.NewUsecase(datasource),
 		runlogoutuser.NewUsecase(datasource),
 		runuserlogin.NewUsecase(datasource),
 		runkocokgruparisan.NewUsecase(datasource),

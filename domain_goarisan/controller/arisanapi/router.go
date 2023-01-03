@@ -28,7 +28,6 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 
 	router.POST("/register", r.runUserCreateHandler())
 	router.POST("/login", r.runUserLoginHandler())
-
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama
@@ -37,4 +36,6 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.POST("/user/:id/join/grup", r.runJoinDetailGrupArisanHandler())
 	resource.POST("/user/:id/arisan/grup/", r.runKocokGrupArisanHandler())
 	resource.POST("/user/logout", r.runLogoutUserHandler())
+	resource.GET("/user/:id", r.findOneUserByIDHandler())
+
 }
