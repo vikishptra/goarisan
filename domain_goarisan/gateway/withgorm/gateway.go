@@ -31,14 +31,15 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	// if err != nil {
 	// 	panic(err)
 	// }
-	DbHost := os.Getenv("MYSQLUSER")
-	DbUser := os.Getenv("MYSQLPASSWORD")
-	DbPassword := os.Getenv("MYSQLHOST")
-	DbName := os.Getenv("MYSQLPORT")
-	DbPort := os.Getenv("MYSQLDATABASE")
+	dbUser := os.Getenv("MYSQLUSER")
+	dbPassword := os.Getenv("MYSQLPASSWORD")
+	dbHost := os.Getenv("MYSQLHOST")
+	dbPort := os.Getenv("MYSQLPORT")
+	database := os.Getenv("MYSQLDATABASE")
 
-	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
-	Db, err := gorm.Open("mysql", DBURL)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+
+	Db, err := gorm.Open("mysql", dsn)
 
 	if err != nil {
 		panic(err)
