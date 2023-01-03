@@ -27,4 +27,4 @@ COPY --from=builder /app/config.json /app
 
 ENTRYPOINT ["vikishptra", "apparisan"]
 
-CMD [ "./vikishptra","todoapp"] --v
+CMD [ "./vikishptra","apparisan"] --v
