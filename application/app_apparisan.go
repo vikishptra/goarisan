@@ -44,6 +44,7 @@ func (apparisan) Run() error {
 	httpHandler := server.NewGinHTTPHandler(log, cfg.Servers[appName].Address, appData)
 
 	x := arisanapi.NewGinController(log, cfg)
+	_, err := os.LookupEnv("PORT")
 	x.AddUsecase(
 		//
 		runupdategruparisanbyidowner.NewUsecase(datasource),
@@ -66,6 +67,9 @@ func (apparisan) Run() error {
 	corsConfig.AllowOrigins = []string{OriginUrl}
 	corsConfig.AllowCredentials = true
 
+	if err {
+		httpHandler.Router.Run()
+	}
 	httpHandler.Router.Use(cors.New(corsConfig))
 	httpHandler.RunWithGracefullyShutdown()
 
