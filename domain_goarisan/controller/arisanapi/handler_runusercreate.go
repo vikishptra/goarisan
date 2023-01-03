@@ -65,7 +65,7 @@ func (r *ginController) runUserCreateHandler() gin.HandlerFunc {
 		jsonRes.Password = res.Password
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
-		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
+		c.JSON(http.StatusCreated, payload.NewSuccessResponse(jsonRes, traceID))
 
 	}
 }

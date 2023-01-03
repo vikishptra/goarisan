@@ -60,7 +60,7 @@ func (r *ginController) runJoinDetailGrupArisanHandler() gin.HandlerFunc {
 		req.ReqDetail.ID_User = jsonReqURI.ReqDetail.ID_User
 		req.ReqDetail.RandomString = util.GenerateID()
 		req.ReqDetail.Now = time.Now()
-		req.ReqGrup.JwtToken = id
+		req.ReqDetail.JwtToken = id
 
 		r.log.Info(ctx, util.MustJSON(req))
 
@@ -69,6 +69,10 @@ func (r *ginController) runJoinDetailGrupArisanHandler() gin.HandlerFunc {
 			if err == errorenum.DataNotFound {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
+				return
+			} else if err == errorenum.HayoMauNgapain {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
 				return
 			}
 			r.log.Error(ctx, err.Error())

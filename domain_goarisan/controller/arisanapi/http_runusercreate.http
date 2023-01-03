@@ -1,6 +1,6 @@
-POST http://localhost:8002/api/v1/register
+POST http://localhost:8002/register
 
 { 
-    "name":"dckndk",
+    "name":"vikibaru",
     "password": "123"
 }

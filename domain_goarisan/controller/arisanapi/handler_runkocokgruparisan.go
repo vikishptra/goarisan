@@ -69,6 +69,10 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusInternalServerError, payload.NewErrorResponse(err, traceID))
 				return
+			} else if err == errorenum.HayoMauNgapain {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
+				return
 			}
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))

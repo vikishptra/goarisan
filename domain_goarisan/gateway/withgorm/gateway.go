@@ -157,9 +157,7 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 
 func (r *Gateway) FindOneGrupByOwner(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID) error {
 
-	var gruparisan entity.Gruparisan
-
-	if err := r.Db.First(&gruparisan, "id_owner = ?", IDUser).First(&gruparisan, "id = ?", IDGrup); err.RecordNotFound() {
+	if err := r.Db.Where("id_owner = ? AND id = ?", IDUser, IDGrup).Find(&entity.Gruparisan{}); err.RecordNotFound() {
 		return errorenum.AndaBukanAdmin
 	}
 

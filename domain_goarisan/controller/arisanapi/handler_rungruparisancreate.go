@@ -82,7 +82,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 		jsonRes.Message = res.Message
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
-		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
+		c.JSON(http.StatusCreated, payload.NewSuccessResponse(jsonRes, traceID))
 
 	}
 }

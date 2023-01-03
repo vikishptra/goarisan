@@ -49,7 +49,9 @@ func JoinGrupArisan(req DetailGrupArisanCreateRequest) (*DetailGrupArisan, error
 }
 func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest, reqUser *User, uang int64) error {
 
-	if reqUser.Money == 0 {
+	if req.ID_User != req.JwtToken {
+		return errorenum.HayoMauNgapain
+	} else if reqUser.Money == 0 {
 		return errorenum.MoneyMin
 	} else if strings.TrimSpace(string(req.ID_Detail_Grup)) == "" || strings.TrimSpace(string(req.ID_User)) == "" {
 		return errorenum.MessageNotEmpty
@@ -79,6 +81,7 @@ func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupAris
 	r.ID_User = reqUser.ID
 	r.Created = req.Created
 	r.Money = req.RulesMoney
+	rand.Seed(time.Now().UnixNano())
 	r.No_undian = rand.Intn(200)
 	return r, nil
 

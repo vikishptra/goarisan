@@ -23,13 +23,12 @@ func (r *runKocokGrupArisanInteractor) Execute(ctx context.Context, req InportRe
 	if err := r.outport.FindOneGrupByOwner(ctx, req.IDUser, req.IDGrup); err != nil {
 		return nil, err
 	}
-
-	detailGrupObj, err := r.outport.FindUndianArisanUser(ctx, req.IDGrup)
-	if err != nil {
+	if err := req.ValidateTokenUser(req.IDUser, req.JwtToken); err != nil {
 		return nil, err
 	}
 
-	if err := req.ValidateTokenUser(req.IDUser, req.JwtToken); err != nil {
+	detailGrupObj, err := r.outport.FindUndianArisanUser(ctx, req.IDGrup)
+	if err != nil {
 		return nil, err
 	}
 
