@@ -20,5 +20,5 @@ const (
 	MoneyTidakBoleh0                         apperror.ErrorType = "ER0014 money tidak boleh0"
 	MoneyAndaTidakBolehKurangDariUpdateMoney apperror.ErrorType = "ER0015 money anda tidak boleh kurang dari update money"
 	GabisaAksesBro                           apperror.ErrorType = "ER0016 gabisa akses bro"
-	RulesMoneyTidakBolehKurangDari0          apperror.ErrorType = "ER0017 rules money tidak boleh kurang dari0"
+	RulesMoneyTidakBolehKurangDari0          apperror.ErrorType = "ER0017 rules money tidak boleh kurang dari 0"
 )
