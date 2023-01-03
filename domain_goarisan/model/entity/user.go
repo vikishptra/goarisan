@@ -88,3 +88,10 @@ func (r *User) Update(req UserUpdateRequest) error {
 func (r *User) VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
+
+func (r *User) UpdateMoney(money int64) error {
+
+	r.Money = r.Money + money
+
+	return nil
+}
