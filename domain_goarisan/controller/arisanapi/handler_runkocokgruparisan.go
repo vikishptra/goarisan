@@ -36,14 +36,7 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReqBIND request
 		id, _ := token.ExtractTokenID(c)
-
-		if err := c.Bind(&jsonReqBIND); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
 
 		var jsonReqURI request
 		if err := c.BindUri(&jsonReqURI); err != nil {
@@ -54,7 +47,7 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 
 		var req InportRequest
 
-		req.IDGrup = jsonReqBIND.IDGrup
+		req.IDGrup = jsonReqURI.IDGrup
 		req.IDUser = jsonReqURI.IDUser
 		req.JwtToken = id
 		r.log.Info(ctx, util.MustJSON(req))
