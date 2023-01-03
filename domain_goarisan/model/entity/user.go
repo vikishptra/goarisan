@@ -90,6 +90,9 @@ func (r *User) VerifyPassword(password, hashedPassword string) error {
 }
 
 func (r *User) UpdateMoney(money int64) error {
+	if money < 0 {
+		return errorenum.MoneyAndaTidakBolehKurangDariUpdateMoney
+	}
 
 	r.Money = r.Money + money
 
