@@ -1,9 +1,12 @@
 # GO-ARISAN
 
+
 GO-ARISAN adalah sebuah microservice arisan yang di dalam nya terdapat operasi untuk melakukan arisan yang sudah menggunakan JWT Authorization
 
-Bagaimana cara untuk memulai aplikasi nya ?
+URL API : 
+https://goarisan-production.up.railway.app
 
+Bagaimana cara untuk memulai aplikasi nya ?
 
 ## GO-ARISAN
 

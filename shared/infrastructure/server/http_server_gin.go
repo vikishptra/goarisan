@@ -25,6 +25,9 @@ func NewGinHTTPHandler(log logger.Logger, address string, appData gogen.Applicat
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, appData)
 	})
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
+	})
 
 	// contentStatic, _ := fs.Sub(web.StaticFiles, "dist")
 	// router.StaticFS("/web", http.FS(contentStatic))
