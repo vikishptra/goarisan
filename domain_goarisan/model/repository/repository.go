@@ -25,6 +25,7 @@ type SaveDetailGrupArisanRepo interface {
 
 type FindGrupArisanByIdRepo interface {
 	FindGrupArisanAndUserById(ctx context.Context, someID vo.GruparisanID, userID vo.UserID) (*entity.Gruparisan, error)
+	FindGrupArisanyIdGrup(ctx context.Context, GrupArisanId vo.GruparisanID) (*entity.Gruparisan, error)
 }
 
 type FindUndianArisanUserRepo interface {
@@ -37,4 +38,12 @@ type FindOneGrupByOwnerRepo interface {
 
 type RunLoginRepo interface {
 	RunLogin(ctx context.Context, username, password string) (string, *entity.User, error)
+}
+
+type GetfindgrupbyidownerRepo interface {
+	Getfindgrupbyidowner(ctx context.Context, IDUser vo.UserID) ([]any, error)
+}
+
+type FindoneuserdetailgruparisansRepo interface {
+	Findoneuserdetailgruparisans(ctx context.Context, IDGrup vo.GruparisanID, IDUser vo.UserID) (*entity.DetailGrupArisan, error)
 }

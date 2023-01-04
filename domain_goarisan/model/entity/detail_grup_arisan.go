@@ -22,7 +22,7 @@ type DetailGrupArisan struct {
 type DetailGrupArisanCreateRequest struct {
 	RandomString   string          `json:"-"`
 	Now            time.Time       `json:"-"`
-	ID_Detail_Grup vo.GruparisanID `json:"id_detail_grup" uri:"id"`
+	ID_Detail_Grup vo.GruparisanID `json:"id_detail_grup" uri:"grup"`
 	ID_User        vo.UserID       `json:"id_user" uri:"id"`
 	RulesMoney     int64           `json:"money"`
 	StatusUser     bool            `bson:"status_user_arisan"`
@@ -55,9 +55,8 @@ func (r *DetailGrupArisan) ValidateGrupJoin(req DetailGrupArisanCreateRequest, r
 		return errorenum.MoneyMin
 	} else if strings.TrimSpace(string(req.ID_Detail_Grup)) == "" || strings.TrimSpace(string(req.ID_User)) == "" {
 		return errorenum.MessageNotEmpty
-	} else if uang >= reqUser.Money {
-		return errorenum.UserStrapped
 	}
+
 	return nil
 }
 
@@ -85,4 +84,14 @@ func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupAris
 	r.No_undian = rand.Intn(200)
 	return r, nil
 
+}
+func (r *DetailGrupArisan) UpdateDetailGrupUser(req DetailGrupArisanCreateRequest, rulesMoney int64) error {
+
+	if req.RulesMoney < 0 {
+		return errorenum.MoneyTidakBoleh0
+	} else if req.RulesMoney == rulesMoney {
+		r.Money = req.RulesMoney
+		return nil
+	}
+	return errorenum.UserStrappedAtauLebihDariRulesMoney
 }

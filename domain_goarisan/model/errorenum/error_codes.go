@@ -21,4 +21,7 @@ const (
 	MoneyAndaTidakBolehKurangDariUpdateMoney apperror.ErrorType = "ER0015 money anda tidak boleh kurang dari update money"
 	GabisaAksesBro                           apperror.ErrorType = "ER0016 gabisa akses bro"
 	RulesMoneyTidakBolehKurangDari0          apperror.ErrorType = "ER0017 rules money tidak boleh kurang dari 0"
+	GabolehLebihDariRulesMoney               apperror.ErrorType = "ER0018 gaboleh lebih dari rules money"
+	NoundianTersebutSudahAda                 apperror.ErrorType = "ER0019 noundian tersebut sudah ada"
+	UserStrappedAtauLebihDariRulesMoney      apperror.ErrorType = "ER0020 uang anda harus pas dengan rules money"
 )

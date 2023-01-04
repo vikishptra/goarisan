@@ -16,5 +16,5 @@ type InportRequest struct {
 }
 
 type InportResponse struct {
-	Items []any
+	Items []any `json:"item"`
 }

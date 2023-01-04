@@ -1,16 +1,17 @@
-package runlogoutuser
+package findgrupbyidowner
 
 import (
+	"vikishptra/domain_goarisan/model/vo"
 	"vikishptra/shared/gogen"
 )
 
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	Token  string `json:"token"`
-	UserId []string
+	UserID   vo.UserID `uri:"id"`
+	JwtToken vo.UserID
 }
 
 type InportResponse struct {
-	Message string `json:"message"`
+	Item []any `json:"item"`
 }

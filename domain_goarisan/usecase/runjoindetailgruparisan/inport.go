@@ -13,5 +13,5 @@ type InportRequest struct {
 }
 
 type InportResponse struct {
-	Message string
+	Message string `json:"message"`
 }

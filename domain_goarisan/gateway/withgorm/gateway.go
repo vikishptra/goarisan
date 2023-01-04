@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -27,17 +28,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
 	dbUser := os.Getenv("MYSQLUSER")
 	dbPassword := os.Getenv("MYSQLPASSWORD")
 	dbHost := os.Getenv("MYSQLHOST")
 	dbPort := os.Getenv("MYSQLPORT")
 	database := os.Getenv("MYSQLDATABASE")
 
+	// DbHost := os.Getenv("DB_HOST")
+	// DbUser := os.Getenv("DB_USER")
+	// DbPassword := os.Getenv("DB_PASSWORD")
+	// DbName := os.Getenv("DB_NAME")
+	// DbPort := os.Getenv("DB_PORT")
+
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -229,4 +238,42 @@ func (r *Gateway) RunLogin(ctx context.Context, username, password string) (stri
 	}
 
 	return token, &user, nil
+}
+
+func (r *Gateway) Getfindgrupbyidowner(ctx context.Context, IDUser vo.UserID) ([]any, error) {
+	var user entity.DataUser
+	var detail_grup_arisans []entity.DetailGrupArisan
+	var testt []any
+	if err := r.Db.Table("users AS u").Select("u.name, u.id, u.money").Where("u.id = ?", IDUser).Find(&user); err.RecordNotFound() {
+		return nil, errorenum.DataGrupNotFound
+	}
+
+	if err := r.Db.Table("detail_grup_arisans AS d").Select("*").Where("d.id_user = ?", IDUser).Find(&detail_grup_arisans); err.RecordNotFound() {
+		return nil, errorenum.DataGrupNotFound
+	}
+
+	user.DetailGrupArisan = detail_grup_arisans
+	testt = append(testt, user)
+
+	return testt, nil
+}
+
+func (r *Gateway) Findoneuserdetailgruparisans(ctx context.Context, IDGrup vo.GruparisanID, IDUser vo.UserID) (*entity.DetailGrupArisan, error) {
+	var grup entity.DetailGrupArisan
+
+	if err := r.Db.Where("id_detail_grup = ? AND  id_user = ? AND money = 0", IDGrup, IDUser).Find(&grup); err.RecordNotFound() {
+		return nil, errorenum.DataNotFound
+	}
+
+	return &grup, nil
+}
+
+func (r *Gateway) FindGrupArisanyIdGrup(ctx context.Context, GrupArisanId vo.GruparisanID) (*entity.Gruparisan, error) {
+	var gruparisan entity.Gruparisan
+
+	if err := r.Db.Where("id = ?", GrupArisanId).Find(&gruparisan); err.RecordNotFound() {
+		return nil, errorenum.DataGrupNotFound
+	}
+
+	return &gruparisan, nil
 }

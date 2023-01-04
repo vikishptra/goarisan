@@ -39,4 +39,6 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.GET("/user/:id", r.findOneUserByIDHandler())
 	resource.PUT("/user/:id/money", r.runupdateusermoneyHandler())
 	resource.PUT("/user/:id/grup/:grup", r.runupdategruparisanbyidownerHandler())
+	resource.GET("/user/:id/grup", r.findgrupbyidownerHandler())
+	resource.PUT("/user/:id/arisan/grup/:grup", r.runupdatdetailgruparisansHandler())
 }

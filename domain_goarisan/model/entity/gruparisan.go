@@ -89,8 +89,10 @@ func (g *Gruparisan) UpdateMoneyUserGrup(reqRules int64, r *User) error {
 
 	if int64(r.Money) == 0 {
 		return errorenum.MoneyMin
+	} else if g.RulesMoney == reqRules {
+		r.Money = r.Money - reqRules
+		return nil
 	}
-	r.Money = r.Money - reqRules
-	return nil
+	return errorenum.UserStrapped
 
 }

@@ -7,11 +7,13 @@ import (
 
 	"vikishptra/domain_goarisan/controller/arisanapi"
 	"vikishptra/domain_goarisan/gateway/withgorm"
+	"vikishptra/domain_goarisan/usecase/findgrupbyidowner"
 	"vikishptra/domain_goarisan/usecase/findoneuserbyid"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
+	"vikishptra/domain_goarisan/usecase/runupdatdetailgruparisans"
 	"vikishptra/domain_goarisan/usecase/runupdategruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/runupdateusermoney"
 	"vikishptra/domain_goarisan/usecase/runusercreate"
@@ -47,6 +49,8 @@ func (apparisan) Run() error {
 	_, err := os.LookupEnv("PORT")
 	x.AddUsecase(
 		//
+		runupdatdetailgruparisans.NewUsecase(datasource),
+		findgrupbyidowner.NewUsecase(datasource),
 		runupdategruparisanbyidowner.NewUsecase(datasource),
 		runupdateusermoney.NewUsecase(datasource),
 		findoneuserbyid.NewUsecase(datasource),
