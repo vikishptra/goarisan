@@ -42,6 +42,7 @@ type RunLoginRepo interface {
 
 type GetfindgrupbyidownerRepo interface {
 	Getfindgrupbyidowner(ctx context.Context, IDUser vo.UserID) ([]any, error)
+	Getfindgruparisanbyiduser(ctx context.Context, IDUser vo.UserID) ([]any, error)
 }
 
 type FindoneuserdetailgruparisansRepo interface {

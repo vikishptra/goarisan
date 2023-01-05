@@ -1,6 +1,7 @@
-package findgrupbyidowner
+package findgruparisanbyidowner
 
 import (
+	"vikishptra/domain_goarisan/model/entity"
 	"vikishptra/domain_goarisan/model/vo"
 	"vikishptra/shared/gogen"
 )
@@ -8,7 +9,7 @@ import (
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	UserID   vo.UserID `uri:"id"`
+	Grup     entity.Gruparisan
 	JwtToken vo.UserID
 }
 

@@ -179,7 +179,7 @@ func (r *Gateway) FindSumMoneyByIDGrup(ctx context.Context, IDGrup vo.Gruparisan
 		return 0, errorenum.SomethingError
 	}
 
-	grupObj, err := r.FindGrupByID(ctx, IDGrup)
+	grupObj, err := r.FindGrupArisanyIdGrup(ctx, IDGrup)
 	if err != nil {
 		return 0, err
 	}
@@ -207,17 +207,6 @@ func (r *Gateway) CountDetailGrupByID(ctx context.Context, IDGrup vo.GruparisanI
 
 }
 
-func (r *Gateway) FindGrupByID(ctx context.Context, IDGrup vo.GruparisanID) (*entity.Gruparisan, error) {
-
-	var gruparisan entity.Gruparisan
-
-	if err := r.Db.First(&gruparisan, "id = ?", IDGrup); err.RecordNotFound() {
-		return nil, errorenum.DataNotFound
-	}
-
-	return &gruparisan, nil
-}
-
 func (r *Gateway) RunLogin(ctx context.Context, username, password string) (string, *entity.User, error) {
 	var user entity.User
 	var UserPassword *entity.User
@@ -240,7 +229,7 @@ func (r *Gateway) RunLogin(ctx context.Context, username, password string) (stri
 }
 
 func (r *Gateway) Getfindgrupbyidowner(ctx context.Context, IDUser vo.UserID) ([]any, error) {
-	var user entity.DataUser
+	var user entity.DataUserDetailGrupArisan
 	var detail_grup_arisans []entity.DetailGrupArisan
 	var testt []any
 	if err := r.Db.Table("users AS u").Select("u.name, u.id, u.money").Where("u.id = ?", IDUser).Find(&user); err.RecordNotFound() {
@@ -275,4 +264,26 @@ func (r *Gateway) FindGrupArisanyIdGrup(ctx context.Context, GrupArisanId vo.Gru
 	}
 
 	return &gruparisan, nil
+}
+func (r *Gateway) Getfindgruparisanbyiduser(ctx context.Context, IDUser vo.UserID) ([]any, error) {
+	var user entity.DataUserGrupArisan
+	var gruparisan []entity.Gruparisan
+	var test []any
+
+	resultUser, err := r.FindUserByID(ctx, IDUser)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.Db.Where("id_owner = ?", resultUser.ID).Find(&gruparisan); err.RecordNotFound() {
+		return nil, errorenum.DataUserNotFound
+	}
+	user.GrupArisan = gruparisan
+	user.ID = resultUser.ID
+	user.Name = resultUser.Name
+	user.Money = resultUser.Money
+	test = append(test, user)
+
+	return test, nil
+
 }

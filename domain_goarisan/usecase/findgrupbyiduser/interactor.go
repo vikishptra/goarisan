@@ -1,4 +1,4 @@
-package findgrupbyidowner
+package findgrupbyiduser
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"vikishptra/shared/util"
 )
 
-type findgrupbyidownerInteractor struct {
+type findgrupbyiduserInteractor struct {
 	outport Outport
 }
 
 func NewUsecase(outputPort Outport) Inport {
-	return &findgrupbyidownerInteractor{
+	return &findgrupbyiduserInteractor{
 		outport: outputPort,
 	}
 }
 
-func (r *findgrupbyidownerInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
+func (r *findgrupbyiduserInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
 	res := &InportResponse{}
 

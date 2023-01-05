@@ -19,11 +19,17 @@ type User struct {
 	Money    int64     `bson:"money" json:"money"`
 }
 
-type DataUser struct {
+type DataUserDetailGrupArisan struct {
 	ID               vo.UserID          `bson:"_id" json:"id"`
 	Name             string             `bson:"name" json:"name" form:"name" binding:"required"`
 	Money            int64              `bson:"money" json:"money"`
 	DetailGrupArisan []DetailGrupArisan `json:"detail_grup"`
+}
+type DataUserGrupArisan struct {
+	ID         vo.UserID    `bson:"_id" json:"id"`
+	Name       string       `bson:"name" json:"name" form:"name" binding:"required"`
+	Money      int64        `bson:"money" json:"money"`
+	GrupArisan []Gruparisan `json:"grup"`
 }
 
 type UserCreateRequest struct {

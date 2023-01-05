@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"vikishptra/domain_goarisan/model/errorenum"
-	"vikishptra/domain_goarisan/usecase/findgrupbyidowner"
+	"vikishptra/domain_goarisan/usecase/findgruparisanbyidowner"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
 	"vikishptra/shared/infrastructure/token"
@@ -15,10 +15,10 @@ import (
 	"vikishptra/shared/util"
 )
 
-func (r *ginController) findgrupbyidownerHandler() gin.HandlerFunc {
+func (r *ginController) findgruparisanbyidOwnerHandler() gin.HandlerFunc {
 
-	type InportRequest = findgrupbyidowner.InportRequest
-	type InportResponse = findgrupbyidowner.InportResponse
+	type InportRequest = findgruparisanbyidowner.InportRequest
+	type InportResponse = findgruparisanbyidowner.InportResponse
 
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
 
@@ -33,25 +33,25 @@ func (r *ginController) findgrupbyidownerHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		traceID := util.GenerateID()
-		id, _ := token.ExtractTokenID(c)
-		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReq request
-		if err := c.BindUri(&jsonReq); err != nil {
+		ctx := logger.SetTraceID(context.Background(), traceID)
+		id, _ := token.ExtractTokenID(c)
+		var jsonReqURI request
+		if err := c.BindUri(&jsonReqURI); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
 
 		var req InportRequest
-		req.UserID = jsonReq.UserID
+		req.Grup.ID_Owner = jsonReqURI.Grup.ID_Owner
 		req.JwtToken = id
 
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
-			if err == errorenum.DataNotFound {
+			if err == errorenum.DataUserNotFound {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
 				return

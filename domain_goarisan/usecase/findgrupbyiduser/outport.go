@@ -1,4 +1,4 @@
-package findgrupbyidowner
+package findgrupbyiduser
 
 import "vikishptra/domain_goarisan/model/repository"
 

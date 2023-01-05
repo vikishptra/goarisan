@@ -96,3 +96,12 @@ func (g *Gruparisan) UpdateMoneyUserGrup(reqRules int64, r *User) error {
 	return errorenum.UserStrapped
 
 }
+
+func (r *Gruparisan) ValidateTokenUserGrupArisan(IDUser vo.UserID, jwtToken vo.UserID) error {
+
+	if IDUser != jwtToken {
+		return errorenum.HayoMauNgapain
+	}
+
+	return nil
+}
