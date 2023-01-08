@@ -22,17 +22,6 @@ func NewGinHTTPHandler(log logger.Logger, address string, appData gogen.Applicat
 	router := gin.Default()
 
 	// PING API
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, appData)
-	})
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
-	})
-
-	// contentStatic, _ := fs.Sub(web.StaticFiles, "dist")
-	// router.StaticFS("/web", http.FS(contentStatic))
-
-	// CORS
 	router.Use(cors.New(cors.Config{
 		ExposeHeaders:   []string{"Data-Length"},
 		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"},
@@ -40,6 +29,14 @@ func NewGinHTTPHandler(log logger.Logger, address string, appData gogen.Applicat
 		AllowHeaders:    []string{"Content-Type", "Authorization"},
 		MaxAge:          12 * time.Hour,
 	}))
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, appData)
+	})
+
+	// contentStatic, _ := fs.Sub(web.StaticFiles, "dist")
+	// router.StaticFS("/web", http.FS(contentStatic))
+
+	// CORS
 
 	return GinHTTPHandler{
 		GracefullyShutdown: NewGracefullyShutdown(log, router, address),

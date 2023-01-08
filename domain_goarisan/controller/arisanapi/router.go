@@ -1,6 +1,8 @@
 package arisanapi
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	"vikishptra/shared/gogen"
@@ -28,6 +30,9 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 
 	router.POST("/register", r.runUserCreateHandler())
 	router.POST("/login", r.runUserLoginHandler())
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
+	})
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama

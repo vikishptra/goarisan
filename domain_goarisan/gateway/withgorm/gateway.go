@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -27,10 +28,10 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
 	dbUser := os.Getenv("MYSQLUSER")
 	dbPassword := os.Getenv("MYSQLPASSWORD")
 	dbHost := os.Getenv("MYSQLHOST")
