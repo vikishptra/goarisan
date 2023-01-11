@@ -36,17 +36,10 @@ func (r *ginController) findOneUserByIDHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReq request
 		id, _ := token.ExtractTokenID(c)
 
-		if err := c.BindUri(&jsonReq); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
-
 		var req InportRequest
-		req.UserID = jsonReq.UserID
+		req.UserID = id
 		req.JwtToken = id
 
 		r.log.Info(ctx, util.MustJSON(req))

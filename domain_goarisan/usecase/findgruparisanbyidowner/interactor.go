@@ -18,7 +18,7 @@ func (r *findgruparisanbyidOwnerInteractor) Execute(ctx context.Context, req Inp
 
 	res := &InportResponse{}
 
-	resultGrupArisan, err := r.outport.Getfindgruparisanbyiduser(ctx, "003de5b6-6304-4603-90d0-dd2736217d93")
+	resultGrupArisan, err := r.outport.Getfindgruparisanbyiduser(ctx, req.Grup.ID_Owner)
 	if err != nil {
 		return nil, err
 	}

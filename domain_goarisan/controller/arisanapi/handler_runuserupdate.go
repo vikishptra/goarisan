@@ -36,14 +36,8 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
-		var jsonReq request
 		id, _ := token.ExtractTokenID(c)
 
-		if err := c.BindUri(&jsonReq); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
 		var jsonReqJSON request
 		if err := c.BindJSON(&jsonReqJSON); err != nil {
 			r.log.Error(ctx, err.Error())
@@ -52,7 +46,7 @@ func (r *ginController) runUserUpdateHandler() gin.HandlerFunc {
 		}
 
 		var req InportRequest
-		req.ID = jsonReq.ID
+		req.ID = id
 		req.Jwt = id
 		req.Name = jsonReqJSON.Name
 

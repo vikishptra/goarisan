@@ -48,3 +48,7 @@ type GetfindgrupbyidownerRepo interface {
 type FindoneuserdetailgruparisansRepo interface {
 	Findoneuserdetailgruparisans(ctx context.Context, IDGrup vo.GruparisanID, IDUser vo.UserID) (*entity.DetailGrupArisan, error)
 }
+
+type DeleteDetailGrupArisanRepo interface {
+	DeleteUserDetailGrupArisan(ctx context.Context, detail_grup_arisanID vo.DetailGrupArisanID) error
+}

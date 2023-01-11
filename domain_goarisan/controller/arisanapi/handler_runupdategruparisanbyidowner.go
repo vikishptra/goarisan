@@ -54,7 +54,7 @@ func (r *ginController) runupdategruparisanbyidownerHandler() gin.HandlerFunc {
 		var req InportRequest
 		req.NamaGrup = jsonReqJSON.NamaGrup
 		req.RulesMoney = jsonReqJSON.RulesMoney
-		req.IDUser = jsonReqURI.IDUser
+		req.IDUser = id
 		req.IDGrup = jsonReqURI.IDGrup
 		req.JwtToken = id
 

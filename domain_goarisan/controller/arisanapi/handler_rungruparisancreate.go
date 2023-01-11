@@ -38,12 +38,6 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 		id, _ := token.ExtractTokenID(c)
 
-		var jsonReqUri request
-		if err := c.BindUri(&jsonReqUri); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
 		var jsonReq request
 		if err := c.BindJSON(&jsonReq); err != nil {
 			r.log.Error(ctx, err.Error())
@@ -53,7 +47,7 @@ func (r *ginController) runGrupArisanCreateHandler() gin.HandlerFunc {
 
 		var req InportRequest
 		req.JwtToken = id
-		req.ID_Owner = jsonReqUri.ID_Owner
+		req.ID_Owner = id
 		req.NamaGrup = jsonReq.NamaGrup
 		req.RulesMoney = jsonReq.RulesMoney
 		req.Now = time.Now()

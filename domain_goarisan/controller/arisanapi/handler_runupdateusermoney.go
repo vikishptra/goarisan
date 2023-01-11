@@ -37,12 +37,6 @@ func (r *ginController) runupdateusermoneyHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 		id, _ := token.ExtractTokenID(c)
 
-		var jsonReqURI request
-		if err := c.BindUri(&jsonReqURI); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
 		var jsonReqJSON request
 		if err := c.BindJSON(&jsonReqJSON); err != nil {
 			r.log.Error(ctx, err.Error())
@@ -51,7 +45,7 @@ func (r *ginController) runupdateusermoneyHandler() gin.HandlerFunc {
 		}
 
 		var req InportRequest
-		req.UserID = jsonReqURI.UserID
+		req.UserID = id
 		req.Money = jsonReqJSON.Money
 		req.JwtToken = id
 

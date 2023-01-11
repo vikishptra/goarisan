@@ -124,16 +124,16 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 	var MaxStatus, MoneyUser int64
 	var result []map[string]any
 
+	//generate nilai random
+	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("status_user_putaran_arisan = 0 AND id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
+		return nil, errorenum.DataArisanAndaSudahBerakhir
+	}
 	//menjumlahkan data uang dari grup arisan kalo 0 maka gabisa ngocok arisan
 	MoneyUser, err := r.FindSumMoneyByIDGrup(ctx, IDGrup, MoneyUser)
 	if err != nil {
 		return nil, err
 	}
 
-	//generate nilai random
-	if err := r.Db.Table("detail_grup_arisans").Select("id_user,name, no_undian").Joins("INNER JOIN users ON users.id = detail_grup_arisans.id_user").Where("status_user_putaran_arisan = 0 AND id_detail_grup = ?", IDGrup).Order("RAND()").Find(&detailGrupArisan); err.RecordNotFound() {
-		return nil, errorenum.DataNotFound
-	}
 	//temuin user id untuk dapatin data users yang di undi
 	users, _ := r.FindUserByID(ctx, detailGrupArisan.ID_User)
 
@@ -286,4 +286,12 @@ func (r *Gateway) Getfindgruparisanbyiduser(ctx context.Context, IDUser vo.UserI
 
 	return test, nil
 
+}
+
+func (r *Gateway) DeleteUserDetailGrupByOwner(ctx context.Context, IDDetailGrup entity.DetailGrupArisan) error {
+
+	if err := r.Db.Where("id = ?", IDDetailGrup).Delete(entity.DetailGrupArisan{}); err.RecordNotFound() {
+		return errorenum.DataUserNotFound
+	}
+	return nil
 }

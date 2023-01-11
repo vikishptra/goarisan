@@ -48,13 +48,13 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 		var req InportRequest
 
 		req.IDGrup = jsonReqURI.IDGrup
-		req.IDUser = jsonReqURI.IDUser
+		req.IDUser = id
 		req.JwtToken = id
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
-			if err == errorenum.AndaBukanAdmin {
+			if err == errorenum.AndaBukanAdmin || err == errorenum.HayoMauNgapain {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
 				return
@@ -62,9 +62,9 @@ func (r *ginController) runKocokGrupArisanHandler() gin.HandlerFunc {
 				r.log.Error(ctx, err.Error())
 				c.JSON(http.StatusInternalServerError, payload.NewErrorResponse(err, traceID))
 				return
-			} else if err == errorenum.HayoMauNgapain {
+			} else if err == errorenum.DataNotFound {
 				r.log.Error(ctx, err.Error())
-				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
+				c.JSON(http.StatusNotFound, payload.NewErrorResponse(err, traceID))
 				return
 			}
 			r.log.Error(ctx, err.Error())

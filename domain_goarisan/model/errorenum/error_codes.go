@@ -24,4 +24,5 @@ const (
 	GabolehLebihDariRulesMoney               apperror.ErrorType = "ER0018 gaboleh lebih dari rules money"
 	NoundianTersebutSudahAda                 apperror.ErrorType = "ER0019 noundian tersebut sudah ada"
 	UserStrappedAtauLebihDariRulesMoney      apperror.ErrorType = "ER0020 uang anda harus pas dengan rules money"
+	DataArisanAndaSudahBerakhir              apperror.ErrorType = "ER0021 data arisan anda sudah berakhir"
 )

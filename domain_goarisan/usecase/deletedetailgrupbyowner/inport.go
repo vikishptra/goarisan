@@ -1,4 +1,4 @@
-package findgrupbyiduser
+package deletedetailgrupbyowner
 
 import (
 	"vikishptra/domain_goarisan/model/vo"
@@ -8,10 +8,9 @@ import (
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	UserID   vo.UserID
-	JwtToken vo.UserID
+	IDUserDetailGrup vo.DetailGrupArisanID `form:"id_detail_user"`
 }
 
 type InportResponse struct {
-	Item []any `json:"item"`
+	Message string `json:"message"`
 }

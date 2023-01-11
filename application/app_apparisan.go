@@ -62,7 +62,6 @@ func (apparisan) Run() error {
 		runjoindetailgruparisan.NewUsecase(datasource),
 		rungruparisancreate.NewUsecase(datasource),
 		runuserupdate.NewUsecase(datasource),
-
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)

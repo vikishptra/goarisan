@@ -36,15 +36,16 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama
-	resource.PUT("/user/:id", r.runUserUpdateHandler())
-	resource.POST("/user/:id/grup", r.runGrupArisanCreateHandler())
-	resource.POST("/user/:id/join/grup", r.runJoinDetailGrupArisanHandler())
-	resource.POST("/user/:id/arisan/grup/:grup", r.runKocokGrupArisanHandler())
+	resource.PUT("/user/", r.runUserUpdateHandler())
+	resource.POST("/user/grup", r.runGrupArisanCreateHandler())
+	resource.POST("/user/join-grup", r.runJoinDetailGrupArisanHandler())
+	resource.POST("/user/arisan/:grup", r.runKocokGrupArisanHandler())
 	resource.POST("/user/logout", r.runLogoutUserHandler())
-	resource.GET("/user/:id", r.findOneUserByIDHandler())
-	resource.PUT("/user/:id/money", r.runupdateusermoneyHandler())
-	resource.PUT("/user/:id/grup/:grup", r.runupdategruparisanbyidownerHandler())
-	resource.GET("/user/:id/grup", r.findgrupbyiduserHandler())
-	resource.PUT("/user/:id/arisan/grup/:grup", r.runupdatdetailgruparisansHandler())
-	resource.GET("/user/:id/owner/grup", r.findgruparisanbyidOwnerHandler())
+	resource.GET("/user/", r.findOneUserByIDHandler())
+	resource.PUT("/user/money", r.runupdateusermoneyHandler())
+	resource.PUT("/user/owner/:grup", r.runupdategruparisanbyidownerHandler())
+	resource.GET("/user/grup", r.findgrupbyiduserHandler())
+	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
+	resource.GET("/user/owner/grup", r.findgruparisanbyidOwnerHandler())
+
 }

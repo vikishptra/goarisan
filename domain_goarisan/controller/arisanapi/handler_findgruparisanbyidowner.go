@@ -44,7 +44,7 @@ func (r *ginController) findgruparisanbyidOwnerHandler() gin.HandlerFunc {
 		}
 
 		var req InportRequest
-		req.Grup.ID_Owner = jsonReqURI.Grup.ID_Owner
+		req.Grup.ID_Owner = id
 		req.JwtToken = id
 
 		r.log.Info(ctx, util.MustJSON(req))

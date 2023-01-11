@@ -51,7 +51,7 @@ func (r *ginController) runupdatdetailgruparisansHandler() gin.HandlerFunc {
 
 		var req InportRequest
 		req.ID_Detail_Grup = jsonURI.ID_Detail_Grup
-		req.ID_User = jsonURI.ID_User
+		req.ID_User = id
 		req.JwtToken = id
 		req.RulesMoney = jsonReq.RulesMoney
 

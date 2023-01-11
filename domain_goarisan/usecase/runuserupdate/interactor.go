@@ -20,8 +20,6 @@ func (r *runUserUpdateInteractor) Execute(ctx context.Context, req InportRequest
 
 	res := &InportResponse{}
 
-	// code your usecase definition here ...
-
 	userObjs, err := r.outport.FindUserByID(ctx, req.ID)
 	if err != nil {
 		return nil, err
