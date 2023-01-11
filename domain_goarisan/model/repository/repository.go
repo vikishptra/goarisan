@@ -50,5 +50,5 @@ type FindoneuserdetailgruparisansRepo interface {
 }
 
 type DeleteDetailGrupArisanRepo interface {
-	DeleteUserDetailGrupArisan(ctx context.Context, detail_grup_arisanID vo.DetailGrupArisanID) error
+	DeleteUserDetailGrupArisan(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) error
 }

@@ -7,6 +7,7 @@ import (
 
 	"vikishptra/domain_goarisan/controller/arisanapi"
 	"vikishptra/domain_goarisan/gateway/withgorm"
+	"vikishptra/domain_goarisan/usecase/deletedetailgrupbyowner"
 	"vikishptra/domain_goarisan/usecase/findgruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/findgrupbyiduser"
 	"vikishptra/domain_goarisan/usecase/findoneuserbyid"
@@ -50,6 +51,7 @@ func (apparisan) Run() error {
 	_, err := os.LookupEnv("PORT")
 	x.AddUsecase(
 		//
+		deletedetailgrupbyowner.NewUsecase(datasource),
 		findgruparisanbyidowner.NewUsecase(datasource),
 		runupdatdetailgruparisans.NewUsecase(datasource),
 		findgrupbyiduser.NewUsecase(datasource),

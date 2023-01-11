@@ -288,10 +288,23 @@ func (r *Gateway) Getfindgruparisanbyiduser(ctx context.Context, IDUser vo.UserI
 
 }
 
-func (r *Gateway) DeleteUserDetailGrupByOwner(ctx context.Context, IDDetailGrup entity.DetailGrupArisan) error {
+func (r *Gateway) DeleteUserDetailGrupArisan(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) error {
+	var detailGrupObj entity.DetailGrupArisan
 
-	if err := r.Db.Where("id = ?", IDDetailGrup).Delete(entity.DetailGrupArisan{}); err.RecordNotFound() {
+	//verifikasi dulu ownernya
+	if _, err := r.FindOneGrupByOwner(ctx, IDOwner, IDGrup); err != nil {
+		return err
+	}
+	//verifikasi dulu usernya
+
+	if err := r.Db.Where("id_user = ? AND id_detail_grup = ?", IDUser, IDGrup).Find(&detailGrupObj); err.RecordNotFound() {
 		return errorenum.DataUserNotFound
 	}
+
+	//proses delete grup
+	if err := r.Db.Where("id_user = ? AND money = 0 AND id_detail_grup = ? ", IDUser, IDGrup).Find(&detailGrupObj).Delete(&detailGrupObj); err.RecordNotFound() {
+		return errorenum.DataUserMasihAdaSaldoArisan
+	}
+
 	return nil
 }

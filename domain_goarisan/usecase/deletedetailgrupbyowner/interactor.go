@@ -18,7 +18,11 @@ func (r *deletedetailgrupbyownerInteractor) Execute(ctx context.Context, req Inp
 
 	res := &InportResponse{}
 
-	if err := r.outport.DeleteUserDetailGrupArisan(ctx, req.IDUserDetailGrup); err != nil {
+	if err := req.DetailGrupArisan.ValidateTokenUser(req.IDOwner, req.IDOwner); err != nil {
+		return nil, err
+	}
+
+	if err := r.outport.DeleteUserDetailGrupArisan(ctx, req.IDUser, req.IDGrup, req.IDOwner); err != nil {
 		return nil, err
 	}
 

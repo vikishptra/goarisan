@@ -47,5 +47,5 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.GET("/user/grup", r.findgrupbyiduserHandler())
 	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
 	resource.GET("/user/owner/grup", r.findgruparisanbyidOwnerHandler())
-
+	resource.DELETE("/user/owner/:id_grup/:id_user", r.deletedetailgrupbyownerHandler())
 }
