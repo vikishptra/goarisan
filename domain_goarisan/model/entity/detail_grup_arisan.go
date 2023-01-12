@@ -68,6 +68,16 @@ func (r *DetailGrupArisan) ValidateTokenUser(IDowner, jwtToken vo.UserID) error 
 
 	return nil
 }
+
+func (r *DetailGrupArisan) ValidateUserSame(IDowner, IDUser vo.UserID) error {
+
+	if IDUser == IDowner {
+		return errorenum.AndaAdalahAdmin
+	}
+
+	return nil
+}
+
 func (r *DetailGrupArisan) SetDetailGrup(req *Gruparisan, reqRand DetailGrupArisanCreateRequest, reqUser *User) (*DetailGrupArisan, error) {
 	id, err := vo.NewDetailGrupArisanID(reqRand.RandomString, req.Created)
 	if err != nil {

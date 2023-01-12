@@ -296,7 +296,6 @@ func (r *Gateway) DeleteUserDetailGrupArisan(ctx context.Context, IDUser vo.User
 		return err
 	}
 	//verifikasi dulu usernya
-
 	if err := r.Db.Where("id_user = ? AND id_detail_grup = ?", IDUser, IDGrup).Find(&detailGrupObj); err.RecordNotFound() {
 		return errorenum.DataUserNotFound
 	}
@@ -307,4 +306,21 @@ func (r *Gateway) DeleteUserDetailGrupArisan(ctx context.Context, IDUser vo.User
 	}
 
 	return nil
+}
+
+func (r *Gateway) RunUpdateOwnerGrup(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) (*entity.Gruparisan, error) {
+
+	grupArisan, err := r.FindGrupArisanyIdGrup(ctx, IDGrup)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := r.FindOneGrupByOwner(ctx, IDOwner, IDGrup); err != nil {
+		return nil, err
+	}
+	//verifikasi dulu usernya
+	if err := r.Db.Model(&entity.DetailGrupArisan{}).Where("id_detail_grup = ? AND id_user = ?", IDGrup, IDUser); err.RecordNotFound() {
+		return nil, errorenum.DataUserNotFound
+	}
+	return grupArisan, nil
 }

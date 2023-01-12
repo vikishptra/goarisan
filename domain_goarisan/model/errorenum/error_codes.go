@@ -9,7 +9,7 @@ const (
 	MoneyMin                                 apperror.ErrorType = "ER0003 uang anda tidak boleh 0 minimal 10000"
 	UserStrapped                             apperror.ErrorType = "ER0004 uang anda harus lebih besar dari rules money"
 	UserAlreadyJoin                          apperror.ErrorType = "ER0005 user already join"
-	AndaBukanAdmin                           apperror.ErrorType = "ER0006 anda bukan admin"
+	AndaBukanAdmin                           apperror.ErrorType = "ER0006 anda bukan owner"
 	AnggotaGrupAndaMasihAdaYangBelumSetoran  apperror.ErrorType = "ER0007 anggota grup anda masih ada yang belum setoran"
 	UsernameAtauPasswordAndaSalah            apperror.ErrorType = "ER0008 username atau password anda salah"
 	UsernameTidakDiTemukan                   apperror.ErrorType = "ER0009 username tidak di temukan"
@@ -26,4 +26,5 @@ const (
 	UserStrappedAtauLebihDariRulesMoney      apperror.ErrorType = "ER0020 uang anda harus pas dengan rules money"
 	DataArisanAndaSudahBerakhir              apperror.ErrorType = "ER0021 data arisan anda sudah berakhir"
 	DataUserMasihAdaSaldoArisan              apperror.ErrorType = "ER0022 data user masih ada saldo arisan"
+	AndaAdalahAdmin                          apperror.ErrorType = "ER0023 anda adalah owner"
 )

@@ -105,3 +105,12 @@ func (r *Gruparisan) ValidateTokenUserGrupArisan(IDUser vo.UserID, jwtToken vo.U
 
 	return nil
 }
+func (r *Gruparisan) UpdateOwnerGrup(idUser vo.UserID) error {
+
+	if strings.TrimSpace(string(idUser)) == "" {
+		return errorenum.MessageNotEmpty
+	}
+	r.ID_Owner = idUser
+
+	return nil
+}

@@ -52,3 +52,7 @@ type FindoneuserdetailgruparisansRepo interface {
 type DeleteDetailGrupArisanRepo interface {
 	DeleteUserDetailGrupArisan(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) error
 }
+
+type RunUpdateOwnerGrupRepo interface {
+	RunUpdateOwnerGrup(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) (*entity.Gruparisan, error)
+}

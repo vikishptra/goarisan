@@ -36,16 +36,23 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama
+
+	//user
 	resource.PUT("/user/", r.runUserUpdateHandler())
+	resource.PUT("/user/money", r.runupdateusermoneyHandler())
+	resource.GET("/user/", r.findOneUserByIDHandler())
+	resource.POST("/user/logout", r.runLogoutUserHandler())
+
+	//grup
 	resource.POST("/user/grup", r.runGrupArisanCreateHandler())
 	resource.POST("/user/join-grup", r.runJoinDetailGrupArisanHandler())
-	resource.POST("/user/arisan/:grup", r.runKocokGrupArisanHandler())
-	resource.POST("/user/logout", r.runLogoutUserHandler())
-	resource.GET("/user/", r.findOneUserByIDHandler())
-	resource.PUT("/user/money", r.runupdateusermoneyHandler())
-	resource.PUT("/user/owner/:grup", r.runupdategruparisanbyidownerHandler())
-	resource.GET("/user/grup", r.findgrupbyiduserHandler())
-	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
 	resource.GET("/user/owner/grup", r.findgruparisanbyidOwnerHandler())
+	resource.PUT("/user/owner/:grup", r.runupdategruparisanbyidownerHandler())
+
+	//detail_grup
+	resource.GET("/user/grup", r.findgrupbyiduserHandler())
+	resource.POST("/user/arisan/:grup", r.runKocokGrupArisanHandler())
+	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
 	resource.DELETE("/user/owner/:id_grup/:id_user", r.deletedetailgrupbyownerHandler())
+	resource.POST("/user/owner", r.runUpdateOwnerGrupHandler())
 }
