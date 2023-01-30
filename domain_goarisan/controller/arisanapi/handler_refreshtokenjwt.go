@@ -32,9 +32,10 @@ func (r *ginController) refreshtokenjwtHandler() gin.HandlerFunc {
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
 		id, _ := token.ExtractTokenIDCookies(c)
-
+		refreshToken := token.ExtractTokenCookie(c)
 		var req InportRequest
 		req.IDUser = id
+		req.Token = refreshToken
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
