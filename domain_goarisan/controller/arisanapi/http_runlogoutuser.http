@@ -1,4 +1,2 @@
-POST http://localhost:8000/api/v1/runlogoutuser
-
-{ 
-}
+POST http://localhost:8002/api/v1/user/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzUwNzU0NjAsInVzZXJfaWQiOiIzMWRiY2JkMy0xMzUyLTRiMTktYjRkNy03ZTRhNjJhYTY0MzAiLCJ1dWlkIjoiYmUyOTE2YzYtMzdjNC00NWZhLWFjNzUtODY5NjA4ZTgwZmRmIn0.piEfEQlqfsPD8sx1pNzjWlLo9ENuYtiMgnDxR1C2qfc

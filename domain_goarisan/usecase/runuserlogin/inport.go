@@ -1,17 +1,24 @@
 package runuserlogin
 
 import (
-	"vikishptra/domain_goarisan/model/entity"
+	"time"
+
 	"vikishptra/shared/gogen"
 )
 
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	entity.UserCreateRequest
+	Email    string    `json:"email" binding:"required"`
+	Password string    `json:"password" binding:"required"`
+	Now      time.Time `json:"time"`
 }
 
 type InportResponse struct {
-	Token string `json:"token"`
-	entity.UserCreateRequest
+	Token        string    `json:"access_token"`
+	Name         string    `json:"name"`
+	Email        string    `json:"email"`
+	Now          time.Time `json:"time"`
+	RandomString string    `json:"id"`
+	RefreshToken string    `json:"refresh_token"`
 }

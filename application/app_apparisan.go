@@ -11,6 +11,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/findgruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/findgrupbyiduser"
 	"vikishptra/domain_goarisan/usecase/findoneuserbyid"
+	"vikishptra/domain_goarisan/usecase/refreshtokenjwt"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
@@ -22,6 +23,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
+	"vikishptra/domain_goarisan/usecase/verifyemail"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/config"
 	"vikishptra/shared/infrastructure/logger"
@@ -52,6 +54,8 @@ func (apparisan) Run() error {
 	_, err := os.LookupEnv("PORT")
 	x.AddUsecase(
 		//
+		verifyemail.NewUsecase(datasource),
+		refreshtokenjwt.NewUsecase(datasource),
 		runupdateownergrup.NewUsecase(datasource),
 		deletedetailgrupbyowner.NewUsecase(datasource),
 		findgruparisanbyidowner.NewUsecase(datasource),

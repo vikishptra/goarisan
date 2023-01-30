@@ -3,30 +3,27 @@ package arisanapi
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/usecase/runuserlogin"
+	"vikishptra/domain_goarisan/usecase/verifyemail"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
 
-func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
+func (r *ginController) verifyEmailHandler() gin.HandlerFunc {
 
-	type InportRequest = runuserlogin.InportRequest
-	type InportResponse = runuserlogin.InportResponse
+	type InportRequest = verifyemail.InportRequest
+	type InportResponse = verifyemail.InportResponse
 
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
 
 	type request struct {
-		InportRequest
 	}
 
 	type response struct {
-		InportResponse
 	}
 
 	return func(c *gin.Context) {
@@ -43,8 +40,6 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 		}
 
 		var req InportRequest
-		req.Email = jsonReq.Email
-		req.Password = jsonReq.Password
 
 		r.log.Info(ctx, util.MustJSON(req))
 
@@ -56,15 +51,7 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
-		jsonRes.Email = res.Email
-		jsonRes.Token = res.Token
-		jsonRes.Now = res.Now
-		jsonRes.RandomString = res.RandomString
-		jsonRes.Name = res.Name
-		jsonRes.RefreshToken = res.RefreshToken
-		domain := os.Getenv("DOMAIN")
-
-		c.SetCookie("refresh_token", res.RefreshToken, 24*60*60*100, "/", domain, false, true)
+		_ = res
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))

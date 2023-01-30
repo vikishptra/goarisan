@@ -4,3 +4,8 @@ POST http://localhost:8002/register
     "name":"vikibaru",
     "password": "123"
 }
+
+###
+GET  http://localhost:8002/api/v1/user/ HTTP/1.1
+Authorization: Bearer
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzQzOTMzOTgsInVzZXJfaWQiOiI4YWRmMzViOS0yYWM4LTRiNmUtYmE5ZC02NjA4M2ZiZGU5OTkiLCJ1dWlkIjoiNDRlMzdmOGUtMDJiMC00OGZmLWI4MmUtOWE4MzM2ZWMwNmI2In0.nx8rD2pZKWjgsXVBNGxEI4_l5Z-gAbgtgtjaDDgmhjw

@@ -4,12 +4,14 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
@@ -32,6 +34,9 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var req InportRequest
+		id, _ := token.ExtractTokenID(c)
+
+		req.Token = id
 
 		r.log.Info(ctx, util.MustJSON(req))
 		res, err := inport.Execute(ctx, req)
@@ -40,11 +45,9 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
-
 		//ubah token menjadi nulll
 		domain := os.Getenv("DOMAIN")
-		c.SetCookie("token", "", -1, "/", domain, false, true)
-		c.SetCookie("logged_in", "", -1, "/", domain, false, true)
+		c.SetCookie("refresh_token", "", time.Now().Second(), "/", domain, false, true)
 
 		var jsonRes response
 		jsonRes.Message = res.Message

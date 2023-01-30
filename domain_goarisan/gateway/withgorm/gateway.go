@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -27,25 +28,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	dbUser := os.Getenv("MYSQLUSER")
-	dbPassword := os.Getenv("MYSQLPASSWORD")
-	dbHost := os.Getenv("MYSQLHOST")
-	dbPort := os.Getenv("MYSQLPORT")
-	database := os.Getenv("MYSQLDATABASE")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	// dbUser := os.Getenv("MYSQLUSER")
+	// dbPassword := os.Getenv("MYSQLPASSWORD")
+	// dbHost := os.Getenv("MYSQLHOST")
+	// dbPort := os.Getenv("MYSQLPORT")
+	// database := os.Getenv("MYSQLDATABASE")
 
-	// DbHost := os.Getenv("DB_HOST")
-	// DbUser := os.Getenv("DB_USER")
-	// DbPassword := os.Getenv("DB_PASSWORD")
-	// DbName := os.Getenv("DB_NAME")
-	// DbPort := os.Getenv("DB_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -56,7 +57,8 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	Db.Model(entity.Gruparisan{}).AddForeignKey("id_owner", "users(id)", "CASCADE", "CASCADE")
 	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_detail_grup", "gruparisans(id)", "CASCADE", "CASCADE")
 	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_user", "users(id)", "CASCADE", "CASCADE")
-
+	Db.Model(entity.User{}).AddIndex("idx_email", "email")
+	Db.Model(entity.User{}).AddIndex("idx_name", "name")
 	if err != nil {
 		panic(err)
 	}
@@ -153,11 +155,11 @@ func (r *Gateway) FindUndianArisanUser(ctx context.Context, IDGrup vo.Gruparisan
 	//update money
 	MoneyUser = users.Money + MoneyUser
 	if err := r.Db.Model(entity.User{}).Where("id = ?", detailGrupArisan.ID_User).Update("money", MoneyUser); err.Error != nil {
-		return nil, err.Error
+		return nil, errorenum.SomethingError
 	}
 
 	if err := r.Db.Model(entity.DetailGrupArisan{}).Where("id_detail_grup = ?", IDGrup).Update("money", 0); err.Error != nil {
-		return nil, err.Error
+		return nil, errorenum.SomethingError
 	}
 
 	return result, nil
@@ -207,25 +209,54 @@ func (r *Gateway) CountDetailGrupByID(ctx context.Context, IDGrup vo.GruparisanI
 
 }
 
-func (r *Gateway) RunLogin(ctx context.Context, username, password string) (string, *entity.User, error) {
+func (r *Gateway) FindUsername(ctx context.Context, username string) (*entity.User, error) {
+	var user entity.User
+	if err := r.Db.Model(&user).Where("name = ?", username).Take(&user); !err.RecordNotFound() {
+		return nil, errorenum.UsernameAndaSudahDigunakan
+	}
+	return &user, nil
+}
+
+func (r *Gateway) FindEmail(ctx context.Context, email string) (*entity.User, error) {
+	var user entity.User
+	if err := r.Db.Model(&user).Where("email = ?", email).Take(&user); !err.RecordNotFound() {
+		return nil, errorenum.EmailAndaSudahDigunakan
+	}
+	return &user, nil
+}
+
+func (r *Gateway) RunLogin(ctx context.Context, email, password string) (string, string, *entity.User, error) {
 	var user entity.User
 	var UserPassword *entity.User
-	if err := r.Db.Model(&user).Where("name = ?", username).Take(&user); err.Error != nil {
-		return "", nil, errorenum.UsernameAtauPasswordAndaSalah
+	if err := r.Db.First(&user, "email = ?", email); err.RecordNotFound() {
+		return "", "", nil, errorenum.UsernameAtauPasswordAndaSalah
 	}
 
 	err := UserPassword.VerifyPassword(password, user.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", nil, errorenum.UsernameAtauPasswordAndaSalah
+		return "", "", nil, errorenum.UsernameAtauPasswordAndaSalah
 	}
 	//dapat token
-	token, err := token.GenerateToken(user.ID)
-
+	access_token, err := token.GenerateToken(user.ID)
+	refreshToken, _ := token.RefreshToken(user.ID)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, err
 	}
 
-	return token, &user, nil
+	if err := r.Db.Model(entity.User{}).Where("id = ?", user.ID).Update("refresh_token", refreshToken); err.Error != nil {
+		return "", "", nil, errorenum.SomethingError
+	}
+
+	return refreshToken, access_token, &user, nil
+}
+
+func (r *Gateway) RunLogout(ctx context.Context, user vo.UserID) error {
+
+	if err := r.Db.Model(entity.User{}).Where("id = ?", user).Update("refresh_token", ""); err.Error != nil {
+		return errorenum.SomethingError
+	}
+
+	return nil
 }
 
 func (r *Gateway) Getfindgrupbyidowner(ctx context.Context, IDUser vo.UserID) ([]any, error) {
@@ -323,4 +354,20 @@ func (r *Gateway) RunUpdateOwnerGrup(ctx context.Context, IDUser vo.UserID, IDGr
 		return nil, errorenum.DataUserNotFound
 	}
 	return grupArisan, nil
+}
+
+func (r *Gateway) RunRefreshTokenJwt(ctx context.Context, IDuser vo.UserID) (string, error) {
+
+	if IDuser == "" {
+		return "", errorenum.GabisaAksesBro
+	}
+	if err := r.Db.Model(entity.User{}).Where("id = ?", IDuser); err.RecordNotFound() {
+		return "", errorenum.HayoMauNgapain
+	}
+	token, err := token.GenerateToken(IDuser)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+
 }

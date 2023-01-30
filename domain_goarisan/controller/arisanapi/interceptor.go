@@ -16,14 +16,14 @@ func (r *ginController) AuthMid() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		traceID := util.GenerateID()
 		//meriksa cookie token dan auth token
-		var access_token string
-		getAuth := token.ExtractToken(c)
-		cookie, _ := c.Cookie("token")
-		err := errorenum.GabisaAksesBro
-
-		access_token = cookie
-		if access_token != getAuth || access_token == "" {
-			c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(err, traceID))
+		refreshToken := token.ExtractTokenCookie(c)
+		if err := token.TokenValid(c); err != nil {
+			c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(errorenum.TokenExpired, traceID))
+			c.Abort()
+			return
+		}
+		if refreshToken == "" {
+			c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(errorenum.TokenExpired, traceID))
 			c.Abort()
 			return
 		}

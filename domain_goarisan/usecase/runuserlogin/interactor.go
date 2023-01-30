@@ -2,6 +2,7 @@ package runuserlogin
 
 import (
 	"context"
+	"time"
 
 	"vikishptra/domain_goarisan/model/errorenum"
 )
@@ -20,9 +21,7 @@ func (r *runUserLoginInteractor) Execute(ctx context.Context, req InportRequest)
 
 	res := &InportResponse{}
 
-	// code your usecase definition here ...
-
-	tokenJwt, userObj, err := r.outport.RunLogin(ctx, req.Name, req.Password)
+	refreshTokenJwt, tokenJwt, userObj, err := r.outport.RunLogin(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +32,16 @@ func (r *runUserLoginInteractor) Execute(ctx context.Context, req InportRequest)
 		return nil, errorenum.SomethingError
 	}
 
+	if err := userObj.ValidateVerifyEmail(userObj.IsActive); err != nil {
+		return nil, err
+	}
+
+	res.Email = userObj.Email
 	res.Name = userObj.Name
-	res.Now = req.Now
-	res.Password = "-"
+	res.Now = time.Now()
 	res.Token = tokenJwt
+	res.RefreshToken = refreshTokenJwt
 	res.RandomString = userObj.ID.String()
-	//!
 
 	return res, nil
 }

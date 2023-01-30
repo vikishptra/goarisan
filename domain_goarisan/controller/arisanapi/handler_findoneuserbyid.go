@@ -22,10 +22,6 @@ func (r *ginController) findOneUserByIDHandler() gin.HandlerFunc {
 
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
 
-	type request struct {
-		InportRequest
-	}
-
 	type response struct {
 		InportResponse
 	}

@@ -19,6 +19,7 @@ func NewUsecase(outputPort Outport) Inport {
 
 func (r *findOneUserByIDInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 	var users []entity.User
+
 	res := &InportResponse{}
 
 	userObjByID, err := r.outport.FindUserByID(ctx, req.UserID)
@@ -30,6 +31,7 @@ func (r *findOneUserByIDInteractor) Execute(ctx context.Context, req InportReque
 	}
 	userObjByID.Password = "-"
 	users = append(users, *userObjByID)
+
 	res.Item = util.ToSliceAny(users)
 
 	return res, nil

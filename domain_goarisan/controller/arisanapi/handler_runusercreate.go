@@ -45,6 +45,7 @@ func (r *ginController) runUserCreateHandler() gin.HandlerFunc {
 		var req InportRequest
 		req.Name = jsonReq.Name
 		req.Password = jsonReq.Password
+		req.Email = jsonReq.Email
 		req.Now = time.Now()
 		req.RandomString = util.GenerateID()
 
@@ -58,12 +59,7 @@ func (r *ginController) runUserCreateHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
-		jsonRes.Name = res.Name
-		jsonRes.Now = res.Now
-		jsonRes.RandomString = res.RandomString
 		jsonRes.Message = res.Message
-		jsonRes.Password = res.Password
-
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusCreated, payload.NewSuccessResponse(jsonRes, traceID))
 

@@ -1,4 +1,4 @@
-package runlogoutuser
+package refreshtokenjwt
 
 import "vikishptra/domain_goarisan/model/repository"
 

@@ -1,4 +1,6 @@
-PUT  http://localhost:8002/api/v1/user/fdedc542-04ad-4f13-8187-673f50c57614
+PUT  http://localhost:8002/api/v1/user/
+Authorization: Bearer
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzQ1MzkyNzYsInVzZXJfaWQiOiIzMWRiY2JkMy0xMzUyLTRiMTktYjRkNy03ZTRhNjJhYTY0MzAiLCJ1dWlkIjoiOTE5ZTkxNTktNTQ5OS00MmI0LWI0OWItMDMwZjc1ZmZhNzQwIn0.SwkTTfyY7_ThBkNEFVMP-SrdoMDxaZ1fVG84FEWg_vc
 
 {
     "name" : "update 4"

@@ -3,27 +3,24 @@ package arisanapi
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 
-	"vikishptra/domain_goarisan/usecase/runuserlogin"
+	"vikishptra/domain_goarisan/model/errorenum"
+	"vikishptra/domain_goarisan/usecase/refreshtokenjwt"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
+	"vikishptra/shared/infrastructure/token"
 	"vikishptra/shared/model/payload"
 	"vikishptra/shared/util"
 )
 
-func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
+func (r *ginController) refreshtokenjwtHandler() gin.HandlerFunc {
 
-	type InportRequest = runuserlogin.InportRequest
-	type InportResponse = runuserlogin.InportResponse
+	type InportRequest = refreshtokenjwt.InportRequest
+	type InportResponse = refreshtokenjwt.InportResponse
 
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
-
-	type request struct {
-		InportRequest
-	}
 
 	type response struct {
 		InportResponse
@@ -34,37 +31,30 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 		traceID := util.GenerateID()
 
 		ctx := logger.SetTraceID(context.Background(), traceID)
-
-		var jsonReq request
-		if err := c.BindJSON(&jsonReq); err != nil {
-			r.log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
-			return
-		}
+		id, _ := token.ExtractTokenIDCookies(c)
 
 		var req InportRequest
-		req.Email = jsonReq.Email
-		req.Password = jsonReq.Password
-
+		req.IDUser = id
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
 		if err != nil {
+			if err == errorenum.HayoMauNgapain {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusForbidden, payload.NewErrorResponse(err, traceID))
+				return
+			} else if err == errorenum.GabisaAksesBro {
+				r.log.Error(ctx, err.Error())
+				c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(err, traceID))
+				return
+			}
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
 
 		var jsonRes response
-		jsonRes.Email = res.Email
-		jsonRes.Token = res.Token
-		jsonRes.Now = res.Now
-		jsonRes.RandomString = res.RandomString
-		jsonRes.Name = res.Name
-		jsonRes.RefreshToken = res.RefreshToken
-		domain := os.Getenv("DOMAIN")
-
-		c.SetCookie("refresh_token", res.RefreshToken, 24*60*60*100, "/", domain, false, true)
+		jsonRes.AccessToken = res.AccessToken
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))

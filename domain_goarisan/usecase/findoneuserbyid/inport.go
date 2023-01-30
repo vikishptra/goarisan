@@ -8,7 +8,7 @@ import (
 type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
-	UserID   vo.UserID `uri:"id"`
+	UserID   vo.UserID
 	JwtToken vo.UserID
 }
 

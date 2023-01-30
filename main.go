@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"time"
+
+	"github.com/getsentry/sentry-go"
 
 	"vikishptra/application"
 	"vikishptra/shared/gogen"
@@ -32,7 +36,25 @@ func main() {
 	if err != nil {
 		return
 	}
+	LogSentry()
 
+}
+
+func LogSentry() {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: "https://0bb83adb841a46fbbbdc54ecfb45d6b4@o4504520878718976.ingest.sentry.io/4504520880619520",
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
+
+	sentry.CaptureMessage("Hehhh")
 }
 
 // func openbrowser(url string) {
