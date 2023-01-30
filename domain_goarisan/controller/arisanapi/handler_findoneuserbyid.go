@@ -57,7 +57,9 @@ func (r *ginController) findOneUserByIDHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
-		jsonRes.Item = res.Item
+		jsonRes.Email = res.Email
+		jsonRes.IsActive = res.IsActive
+		jsonRes.Name = res.Name
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))

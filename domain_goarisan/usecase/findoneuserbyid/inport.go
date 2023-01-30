@@ -13,5 +13,7 @@ type InportRequest struct {
 }
 
 type InportResponse struct {
-	Item []any `json:"item"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	IsActive bool   `json:"is_active"`
 }

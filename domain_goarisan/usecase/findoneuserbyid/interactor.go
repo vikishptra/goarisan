@@ -2,9 +2,6 @@ package findoneuserbyid
 
 import (
 	"context"
-
-	"vikishptra/domain_goarisan/model/entity"
-	"vikishptra/shared/util"
 )
 
 type findOneUserByIDInteractor struct {
@@ -18,7 +15,6 @@ func NewUsecase(outputPort Outport) Inport {
 }
 
 func (r *findOneUserByIDInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
-	var users []entity.User
 
 	res := &InportResponse{}
 
@@ -29,10 +25,9 @@ func (r *findOneUserByIDInteractor) Execute(ctx context.Context, req InportReque
 	if err := userObjByID.ValidateTokenUser(req.UserID, req.JwtToken); err != nil {
 		return nil, err
 	}
-	userObjByID.Password = "-"
-	users = append(users, *userObjByID)
-
-	res.Item = util.ToSliceAny(users)
+	res.Email = userObjByID.Email
+	res.IsActive = userObjByID.IsActive
+	res.Name = userObjByID.Name
 
 	return res, nil
 }
