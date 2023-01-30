@@ -18,8 +18,11 @@ func (r *verifyEmailInteractor) Execute(ctx context.Context, req InportRequest) 
 
 	res := &InportResponse{}
 
-	// code your usecase definition here ...
-	//!
+	err := r.outport.RunVerifyEmail(ctx, req.Id, req.Code)
+	if err != nil {
+		return nil, err
+	}
 
+	res.Message = "ok success verifikasi email anda"
 	return res, nil
 }

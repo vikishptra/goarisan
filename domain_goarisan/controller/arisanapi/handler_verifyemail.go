@@ -21,9 +21,11 @@ func (r *ginController) verifyEmailHandler() gin.HandlerFunc {
 	inport := gogen.GetInport[InportRequest, InportResponse](r.GetUsecase(InportRequest{}))
 
 	type request struct {
+		InportRequest
 	}
 
 	type response struct {
+		InportResponse
 	}
 
 	return func(c *gin.Context) {
@@ -33,14 +35,15 @@ func (r *ginController) verifyEmailHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var jsonReq request
-		if err := c.BindJSON(&jsonReq); err != nil {
+		if err := c.Bind(&jsonReq); err != nil {
 			r.log.Error(ctx, err.Error())
 			c.JSON(http.StatusBadRequest, payload.NewErrorResponse(err, traceID))
 			return
 		}
 
 		var req InportRequest
-
+		req.Code = jsonReq.Code
+		req.Id = jsonReq.Id
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
@@ -51,7 +54,7 @@ func (r *ginController) verifyEmailHandler() gin.HandlerFunc {
 		}
 
 		var jsonRes response
-		_ = res
+		jsonRes.Message = res.Message
 
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))

@@ -8,6 +8,7 @@ type Inport gogen.Inport[InportRequest, InportResponse]
 
 type InportRequest struct {
 	IDUser string
+	Token  string
 }
 
 type InportResponse struct {

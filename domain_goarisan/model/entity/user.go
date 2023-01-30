@@ -134,12 +134,12 @@ func NewUser(req UserCreateRequest) (*User, error) {
 	obj.VerificationCode = verification_code
 
 	emailData := EmailData{
-		URL:       os.Getenv("ORIGIN") + "/verifyemail/" + code,
+		URL:       os.Getenv("ORIGIN") + "/verifyemail/?code=" + code + "&id=" + string(obj.ID),
 		FirstName: obj.Name,
 		Subject:   "Verifikasi code kamu!",
 	}
 
-	SendEmail(&obj, req.Email, &emailData)
+	go SendEmail(&obj, req.Email, &emailData)
 
 	return &obj, nil
 }

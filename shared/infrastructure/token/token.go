@@ -34,7 +34,7 @@ func RefreshToken(user_id vo.UserID) (string, error) {
 	claims["authorized"] = true
 	claims["user_id"] = user_id
 	claims["uuid"] = util.GenerateID()
-	claims["exp"] = time.Now().Add(time.Second * 50).Unix()
+	claims["exp"] = time.Now().Add(time.Minute * 60).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

@@ -34,4 +34,6 @@ const (
 	EmailAndaSudahDigunakan                  apperror.ErrorType = "ER0028 email anda sudah digunakan"
 	EmailBelumDiKonfirmasi                   apperror.ErrorType = "ER0029 email belum di konfirmasi"
 	TokenExpired                             apperror.ErrorType = "ER0030 token expired"
+	SepertinyaAdaYangSalahDariAnda           apperror.ErrorType = "ER0031 sepertinya ada yang salah dari anda"
+	EmailSudahDiKonfirmasi                   apperror.ErrorType = "ER0032 email sudah di konfirmasi"
 )

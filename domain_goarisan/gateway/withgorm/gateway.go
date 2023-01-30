@@ -17,6 +17,7 @@ import (
 	"vikishptra/shared/infrastructure/config"
 	"vikishptra/shared/infrastructure/logger"
 	"vikishptra/shared/infrastructure/token"
+	"vikishptra/shared/util"
 )
 
 type Gateway struct {
@@ -356,9 +357,13 @@ func (r *Gateway) RunUpdateOwnerGrup(ctx context.Context, IDUser vo.UserID, IDGr
 	return grupArisan, nil
 }
 
-func (r *Gateway) RunRefreshTokenJwt(ctx context.Context, IDuser vo.UserID) (string, error) {
-
-	if IDuser == "" {
+func (r *Gateway) RunRefreshTokenJwt(ctx context.Context, IDuser vo.UserID, tokens string) (string, error) {
+	var user entity.User
+	if err := r.Db.First(&user, "id = ?", IDuser); err.RecordNotFound() {
+		return "", errorenum.GabisaAksesBro
+	}
+	tokenss := user.RefreshToken
+	if IDuser == "" || tokenss != tokens {
 		return "", errorenum.GabisaAksesBro
 	}
 	if err := r.Db.Model(entity.User{}).Where("id = ?", IDuser); err.RecordNotFound() {
@@ -369,5 +374,22 @@ func (r *Gateway) RunRefreshTokenJwt(ctx context.Context, IDuser vo.UserID) (str
 		return "", err
 	}
 	return token, nil
+
+}
+
+func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
+	var user entity.User
+	verification_code := util.Encode(code)
+	if err := r.Db.First(&user, "id = ? AND verification_code = ?", id, verification_code); err.RecordNotFound() {
+		return errorenum.SepertinyaAdaYangSalahDariAnda
+	}
+	if user.IsActive {
+		return errorenum.EmailSudahDiKonfirmasi
+	}
+	if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("is_active", 1); err.RecordNotFound() {
+		return errorenum.SomethingError
+	}
+
+	return nil
 
 }

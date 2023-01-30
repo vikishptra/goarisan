@@ -20,7 +20,7 @@ func (r *refreshtokenjwtInteractor) Execute(ctx context.Context, req InportReque
 
 	res := &InportResponse{}
 
-	token, err := r.outport.RunRefreshTokenJwt(ctx, vo.UserID(req.IDUser))
+	token, err := r.outport.RunRefreshTokenJwt(ctx, vo.UserID(req.IDUser), req.Token)
 	if err != nil {
 		return nil, err
 	}
