@@ -1,6 +1,8 @@
 POST http://localhost:8002/login
+Content-Type: application/json 
 
 { 
-    "name":"dckndk",
+
+    "email":"vikisahputra@gmail.com",
     "password":"123"
 }
