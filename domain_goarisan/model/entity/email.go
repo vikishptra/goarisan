@@ -9,7 +9,6 @@ import (
 	"text/template"
 
 	"github.com/joho/godotenv"
-	"github.com/k3a/html2text"
 	"gopkg.in/gomail.v2"
 )
 
@@ -67,7 +66,7 @@ func SendEmail(user *User, toEmail string, data *EmailData) {
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", data.Subject)
 	m.SetBody("text/html", body.String())
-	m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
+	// m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
 
 	d := gomail.NewDialer(host, port, from, password)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}

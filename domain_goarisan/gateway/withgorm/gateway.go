@@ -33,21 +33,21 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	if err != nil {
 		panic(err)
 	}
-	// dbUser := os.Getenv("MYSQLUSER")
-	// dbPassword := os.Getenv("MYSQLPASSWORD")
-	// dbHost := os.Getenv("MYSQLHOST")
-	// dbPort := os.Getenv("MYSQLPORT")
-	// database := os.Getenv("MYSQLDATABASE")
+	dbUser := os.Getenv("MYSQLUSER")
+	dbPassword := os.Getenv("MYSQLPASSWORD")
+	dbHost := os.Getenv("MYSQLHOST")
+	dbPort := os.Getenv("MYSQLPORT")
+	database := os.Getenv("MYSQLDATABASE")
 
-	DbHost := os.Getenv("DB_HOST")
-	DbUser := os.Getenv("DB_USER")
-	DbPassword := os.Getenv("DB_PASSWORD")
-	DbName := os.Getenv("DB_NAME")
-	DbPort := os.Getenv("DB_PORT")
+	// DbHost := os.Getenv("DB_HOST")
+	// DbUser := os.Getenv("DB_USER")
+	// DbPassword := os.Getenv("DB_PASSWORD")
+	// DbName := os.Getenv("DB_NAME")
+	// DbPort := os.Getenv("DB_PORT")
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
