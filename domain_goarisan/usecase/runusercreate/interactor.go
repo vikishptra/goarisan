@@ -27,6 +27,9 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	if err != nil {
 		return nil, err
 	}
+	if err := todoObj.CheckPasswordCriteria(req.Password); err != nil {
+		return nil, err
+	}
 	if err := todoObj.ValidateUserCreate(req.UserCreateRequest); err != nil {
 		return nil, err
 	}

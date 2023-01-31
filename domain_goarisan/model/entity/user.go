@@ -1,12 +1,14 @@
 package entity
 
 import (
+	"errors"
 	"html"
 	"net"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/thanhpk/randstr"
 	"golang.org/x/crypto/bcrypt"
@@ -173,5 +175,48 @@ func (r *User) UpdateMoney(money int64) error {
 
 	r.Money = r.Money + money
 
+	return nil
+}
+
+func (r *User) CheckPasswordCriteria(password string) error {
+
+	var err error
+	var pswdLowercase, pswdUppercase, pswdNumber, pswdSpecial, pswdLength, pswdNoSpaces bool
+	pswdNoSpaces = true
+	for _, char := range password {
+		switch {
+		case unicode.IsLower(char):
+			pswdLowercase = true
+		case unicode.IsUpper(char):
+			pswdUppercase = true
+			err = errors.New("Pa")
+		case unicode.IsNumber(char):
+			pswdNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			pswdSpecial = true
+		case unicode.IsSpace(int32(char)):
+			pswdNoSpaces = false
+		}
+	}
+	if 7 < len(password) && len(password) < 60 {
+		pswdLength = true
+	}
+	if !pswdLowercase || !pswdUppercase || !pswdNumber || !pswdSpecial || !pswdLength || !pswdNoSpaces {
+		switch false {
+		case pswdLowercase:
+			err = errorenum.KataSandiHarusBerisiSetidaknyaSatuHurufKecil
+		case pswdUppercase:
+			err = errorenum.KataSandiHarusBerisiSetidaknyaSatuHurufBesar
+		case pswdNumber:
+			err = errorenum.KataSandiHarusBerisiSetidaknyaSatuAngka
+		case pswdSpecial:
+			err = errorenum.KataSandiHarusBerisiSetidaknyaSatuSpesialKarakter
+		case pswdLength:
+			err = errorenum.PanjangKataSandiHarusMinimal8KarakterDanKurangDari60
+		case pswdNoSpaces:
+			err = errorenum.KataSandiTidakBolehMemilikiSpasi
+		}
+		return err
+	}
 	return nil
 }

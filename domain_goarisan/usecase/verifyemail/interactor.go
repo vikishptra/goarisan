@@ -17,7 +17,6 @@ func NewUsecase(outputPort Outport) Inport {
 func (r *verifyEmailInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
 	res := &InportResponse{}
-
 	err := r.outport.RunVerifyEmail(ctx, req.Id, req.Code)
 	if err != nil {
 		return nil, err
