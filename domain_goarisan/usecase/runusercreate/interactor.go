@@ -19,22 +19,24 @@ func NewUsecase(outputPort Outport) Inport {
 func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
 	res := &InportResponse{}
-	_, err := r.outport.FindEmail(ctx, req.Email)
+	userObj, err := r.outport.FindEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
-	todoObj, err := entity.NewUser(req.UserCreateRequest)
+	if err := userObj.CheckPasswordCriteria(req.Password); err != nil {
+		return nil, err
+	}
+	if err := userObj.ValidateUserCreate(req.UserCreateRequest); err != nil {
+		return nil, err
+	}
+	userObj, err = entity.NewUser(req.UserCreateRequest)
 	if err != nil {
 		return nil, err
 	}
-	if err := todoObj.CheckPasswordCriteria(req.Password); err != nil {
+	if err := userObj.HashPassword(req.UserCreateRequest); err != nil {
 		return nil, err
 	}
-	if err := todoObj.ValidateUserCreate(req.UserCreateRequest); err != nil {
-		return nil, err
-	}
-
-	if err := r.outport.SaveUser(ctx, todoObj); err != nil {
+	if err := r.outport.SaveUser(ctx, userObj); err != nil {
 		return nil, err
 	}
 

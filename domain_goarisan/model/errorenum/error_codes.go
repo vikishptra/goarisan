@@ -43,4 +43,5 @@ const (
 	PanjangKataSandiHarusMinimal8KarakterDanKurangDari60 apperror.ErrorType = "ER0037 panjang kata sandi harus minimal 8 karakter dan kurang dari  60"
 	KataSandiTidakBolehMemilikiSpasi                     apperror.ErrorType = "ER0038 kata sandi tidak boleh memiliki spasi"
 	KonfirmasiEmailAndaSudahKadaluawarsa                 apperror.ErrorType = "ER0039 konfirmasi email anda sudah kadaluarwarsa"
+	NamaTidakBolehLebihDari253                           apperror.ErrorType = "ER0040 nama tidak boleh lebih dari 253"
 )

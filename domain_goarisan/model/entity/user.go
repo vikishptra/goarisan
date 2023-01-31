@@ -53,7 +53,9 @@ type UserCreateRequest struct {
 }
 
 func (r *User) ValidateUserCreate(req UserCreateRequest) error {
-
+	if err := ValidateName(req.Name); err != nil {
+		return err
+	}
 	//hashpassword
 	if err := checkEmailValid(req.Email); err != nil {
 		return err
@@ -61,15 +63,6 @@ func (r *User) ValidateUserCreate(req UserCreateRequest) error {
 	if err := checkEmailDomain(req.Email); err != nil {
 		return err
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	r.Password = string(hashedPassword)
-
-	//hapusspace
-	r.Name = html.EscapeString(strings.TrimSpace(req.Name))
-
 	return nil
 
 }
@@ -154,8 +147,8 @@ type UserUpdateRequest struct {
 
 func (r *User) Update(req UserUpdateRequest) error {
 	r.Name = req.Name
-	if strings.TrimSpace(req.Name) == "" {
-		return errorenum.MessageNotEmpty
+	if err := ValidateName(req.Name); err != nil {
+		return err
 	}
 	if req.ID != vo.UserID(req.Jwt) {
 		return errorenum.HayoMauNgapain
@@ -218,5 +211,25 @@ func (r *User) CheckPasswordCriteria(password string) error {
 		}
 		return err
 	}
+	return nil
+}
+func ValidateName(nama string) error {
+	if strings.TrimSpace(nama) == "" {
+		return errorenum.MessageNotEmpty
+	} else if len(nama) > 253 {
+		return errorenum.NamaTidakBolehLebihDari253
+	}
+	return nil
+}
+
+func (r *User) HashPassword(req UserCreateRequest) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	r.Password = string(hashedPassword)
+
+	//hapusspace
+	r.Name = html.EscapeString(strings.TrimSpace(req.Name))
 	return nil
 }
