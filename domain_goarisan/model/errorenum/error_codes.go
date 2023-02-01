@@ -44,4 +44,5 @@ const (
 	KataSandiTidakBolehMemilikiSpasi                     apperror.ErrorType = "ER0038 kata sandi tidak boleh memiliki spasi"
 	KonfirmasiEmailAndaSudahKadaluawarsa                 apperror.ErrorType = "ER0039 konfirmasi email anda sudah kadaluarwarsa"
 	NamaTidakBolehLebihDari253                           apperror.ErrorType = "ER0040 nama tidak boleh lebih dari 253"
+	TooManyRequests                                      apperror.ErrorType = "ER0041 too many requests"
 )

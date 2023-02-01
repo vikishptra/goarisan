@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/juju/ratelimit"
 
 	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/shared/infrastructure/token"
@@ -27,7 +28,18 @@ func (r *ginController) AuthMid() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 	}
 
+}
+
+func RateLimitMiddleware(bucket *ratelimit.Bucket) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if bucket.TakeAvailable(1) == 0 {
+			traceID := util.GenerateID()
+			c.JSON(http.StatusTooManyRequests, payload.NewErrorResponse(errorenum.TooManyRequests, traceID))
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }

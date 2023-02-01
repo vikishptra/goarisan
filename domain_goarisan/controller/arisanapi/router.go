@@ -2,8 +2,10 @@ package arisanapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/juju/ratelimit"
 
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/config"
@@ -27,11 +29,12 @@ func NewGinController(log logger.Logger, cfg *config.Config) gogen.RegisterRoute
 }
 
 func (r *ginController) RegisterRouter(router selectedRouter) {
-
+	bucket := ratelimit.NewBucket(time.Minute, 5)
 	router.POST("/register", r.runUserCreateHandler())
 	router.POST("/login", r.runUserLoginHandler())
 	router.GET("/refresh-token", r.refreshtokenjwtHandler())
 	router.GET("/verifyemail", r.verifyEmailHandler())
+	router.POST("/confirm", RateLimitMiddleware(bucket), r.sendemailconfirmHandler())
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
 	})
@@ -57,5 +60,4 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
 	resource.DELETE("/user/owner/:id_grup/:id_user", r.deletedetailgrupbyownerHandler())
 	resource.POST("/user/owner", r.runUpdateOwnerGrupHandler())
-
 }

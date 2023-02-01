@@ -12,6 +12,7 @@ type SaveUserRepo interface {
 	FindUsername(ctx context.Context, username string) (*entity.User, error)
 	FindEmail(ctx context.Context, email string) (*entity.User, error)
 	RunVerifyEmail(ctx context.Context, id, code string) error
+	FindEmailConfirmUser(ctx context.Context, email string) (*entity.User, error)
 }
 
 type FindUserByIDRepo interface {

@@ -233,3 +233,8 @@ func (r *User) HashPassword(req UserCreateRequest) error {
 	r.Name = html.EscapeString(strings.TrimSpace(req.Name))
 	return nil
 }
+
+func SendEmailConfirmUser(code string, obj *User) {
+	verification_code := util.Encode(code)
+	obj.VerificationCode = verification_code
+}

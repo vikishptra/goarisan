@@ -19,9 +19,7 @@ func main() {
 		//
 		"apparisan": application.NewApparisan(),
 	}
-
 	flag.Parse()
-
 	app, exist := appMap[flag.Arg(0)]
 	if !exist {
 		fmt.Println("You may try 'go run main.go <app_name>' :")

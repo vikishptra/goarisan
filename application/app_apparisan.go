@@ -23,6 +23,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
+	"vikishptra/domain_goarisan/usecase/sendemailconfirm"
 	"vikishptra/domain_goarisan/usecase/verifyemail"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/config"
@@ -52,8 +53,10 @@ func (apparisan) Run() error {
 
 	x := arisanapi.NewGinController(log, cfg)
 	_, err := os.LookupEnv("PORT")
+
 	x.AddUsecase(
 		//
+		sendemailconfirm.NewUsecase(datasource),
 		verifyemail.NewUsecase(datasource),
 		refreshtokenjwt.NewUsecase(datasource),
 		runupdateownergrup.NewUsecase(datasource),
