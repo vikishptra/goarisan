@@ -36,6 +36,7 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	if err := userObj.HashPassword(req.UserCreateRequest); err != nil {
 		return nil, err
 	}
+
 	if err := r.outport.SaveUser(ctx, userObj); err != nil {
 		return nil, err
 	}
