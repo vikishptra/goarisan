@@ -1,8 +1,13 @@
 package application
 
 import (
+	"fmt"
+	"log"
 	"os"
+	"time"
 
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/cors"
 
 	"vikishptra/domain_goarisan/controller/arisanapi"
@@ -50,6 +55,7 @@ func (apparisan) Run() error {
 	datasource := withgorm.NewGateway(log, appData, cfg)
 
 	httpHandler := server.NewGinHTTPHandler(log, cfg.Servers[appName].Address, appData)
+	LogSentry()
 
 	x := arisanapi.NewGinController(log, cfg)
 	_, err := os.LookupEnv("PORT")
@@ -76,7 +82,6 @@ func (apparisan) Run() error {
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)
-
 	corsConfig := cors.DefaultConfig()
 	Origin := os.Getenv("ORIGIN")
 	OriginUrl := Origin
@@ -87,7 +92,32 @@ func (apparisan) Run() error {
 		httpHandler.Router.Run()
 	}
 	httpHandler.Router.Use(cors.New(corsConfig))
+	httpHandler.Router.Use(sentrygin.New(sentrygin.Options{}))
+
 	httpHandler.RunWithGracefullyShutdown()
 
 	return nil
+}
+func LogSentry() {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:              "https://0bb83adb841a46fbbbdc54ecfb45d6b4@o4504520878718976.ingest.sentry.io/4504520880619520",
+		EnableTracing:    true,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
+	defer func() {
+		if r := recover(); r != nil {
+			sentry.CaptureException(fmt.Errorf("%v", r))
+			sentry.Flush(2 * time.Second)
+		}
+	}()
+	if err != nil {
+		sentry.CaptureException(err)
+	}
+
+	sentry.CaptureMessage("error bro")
 }
