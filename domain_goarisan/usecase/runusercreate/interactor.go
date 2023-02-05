@@ -23,10 +23,10 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	if err != nil {
 		return nil, err
 	}
-	if err := userObj.CheckPasswordCriteria(req.Password); err != nil {
+	if err := userObj.ValidateUserCreate(req.UserCreateRequest); err != nil {
 		return nil, err
 	}
-	if err := userObj.ValidateUserCreate(req.UserCreateRequest); err != nil {
+	if err := userObj.CheckPasswordCriteria(req.Password); err != nil {
 		return nil, err
 	}
 	userObj, err = entity.NewUser(req.UserCreateRequest)
@@ -44,7 +44,7 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	// message := []any{
 	// 	"ok success create user",
 	// }
-	res.Message = "ok success mohon ke email anda untuk verifikasi akun anda yang sudah di kirimkan"
+	res.Message = "Mohon ke email anda untuk verifikasi akun anda yang sudah di kirimkan"
 
 	return res, nil
 }

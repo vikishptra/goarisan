@@ -45,4 +45,5 @@ const (
 	KonfirmasiEmailAndaSudahKadaluawarsa                 apperror.ErrorType = "ER0039 konfirmasi email anda sudah kadaluarwarsa"
 	NamaTidakBolehLebihDari253                           apperror.ErrorType = "ER0040 nama tidak boleh lebih dari 253"
 	TooManyRequests                                      apperror.ErrorType = "ER0041 too many requests"
+	PasswordTidakSama                                    apperror.ErrorType = "ER0042 password tidak sama"
 )

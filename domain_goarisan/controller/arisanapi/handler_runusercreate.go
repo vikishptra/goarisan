@@ -46,6 +46,7 @@ func (r *ginController) runUserCreateHandler() gin.HandlerFunc {
 		req.Name = jsonReq.Name
 		req.Password = jsonReq.Password
 		req.Email = jsonReq.Email
+		req.ConfirmPassword = jsonReq.ConfirmPassword
 		req.Now = time.Now()
 		req.RandomString = util.GenerateID()
 

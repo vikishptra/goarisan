@@ -27,7 +27,7 @@ func (r *sendemailconfirmInteractor) Execute(ctx context.Context, req InportRequ
 		return nil, err
 	}
 	emailData := entity.EmailData{
-		URL:       os.Getenv("ORIGIN") + "/verifyemail/?code=" + code + "&id=" + userObj.ID.String(),
+		URL:       os.Getenv("DOMAIN_EMAIL") + "/verifyemail/?code=" + code + "&id=" + userObj.ID.String(),
 		FirstName: userObj.Name,
 		Subject:   "Verifikasi code kamu!",
 	}

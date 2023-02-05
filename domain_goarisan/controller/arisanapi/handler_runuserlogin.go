@@ -62,10 +62,9 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 		jsonRes.RandomString = res.RandomString
 		jsonRes.Name = res.Name
 		jsonRes.RefreshToken = res.RefreshToken
-		domain := os.Getenv("DOMAIN")
-
-		c.SetCookie("refresh_token", res.RefreshToken, 24*60*60*100, "/", domain, false, true)
-
+		domain := os.Getenv("ORIGIN")
+		timeToken := 24 * 60 * 60 * 100
+		c.SetCookie("refresh_token", res.RefreshToken, timeToken, "/", domain, false, true)
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 

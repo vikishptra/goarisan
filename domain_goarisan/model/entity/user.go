@@ -21,12 +21,12 @@ import (
 type User struct {
 	ID               vo.UserID `bson:"_id" json:"id"`
 	Created          time.Time `bson:"created" json:"created"`
-	Name             string    `bson:"name" json:"name" form:"name" binding:"required"`
-	Email            string    `bson:"email" json:"email" form:"email" binding:"required"`
+	Name             string    `bson:"name" json:"name" form:"name"`
+	Email            string    `bson:"email" json:"email" form:"email" `
 	IsActive         bool      `bson:"is_active" json:"is_active" form:"is_active"`
 	VerificationCode string
 	RefreshToken     string
-	Password         string `form:"password" json:"password" binding:"required"`
+	Password         string `form:"password" json:"password"`
 	Money            int64  `bson:"money" json:"money"`
 }
 
@@ -38,21 +38,27 @@ type DataUserDetailGrupArisan struct {
 }
 type DataUserGrupArisan struct {
 	ID         vo.UserID    `bson:"_id" json:"id"`
-	Name       string       `bson:"name" json:"name" form:"name" binding:"required"`
+	Name       string       `bson:"name" json:"name" form:"name"`
 	Money      int64        `bson:"money" json:"money"`
 	GrupArisan []Gruparisan `json:"grup"`
 }
 
 type UserCreateRequest struct {
-	RandomString string    `json:"id"`
-	Now          time.Time `json:"time"`
-	Name         string    `bson:"name" json:"name" form:"name" binding:"required"`
-	Email        string    `bson:"email" json:"email" form:"email" binding:"required"`
-	Password     string    `form:"password" json:"password" binding:"required"`
-	Money        int64     `json:"-"`
+	RandomString    string    `json:"id"`
+	Now             time.Time `json:"time"`
+	Name            string    `bson:"name" json:"name" form:"name"`
+	Email           string    `bson:"email" json:"email" form:"email"`
+	Password        string    `form:"password" json:"password"`
+	ConfirmPassword string    `form:"confirm_password" json:"confirm_password"`
+	Money           int64     `json:"-"`
 }
 
 func (r *User) ValidateUserCreate(req UserCreateRequest) error {
+	if strings.TrimSpace(req.Email) == "" || strings.TrimSpace(req.Password) == "" {
+		return errorenum.SepertinyaAdaYangSalahDariAnda
+	} else if req.ConfirmPassword != req.Password {
+		return errorenum.PasswordTidakSama
+	}
 	if err := ValidateName(req.Name); err != nil {
 		return err
 	}
@@ -129,7 +135,7 @@ func NewUser(req UserCreateRequest) (*User, error) {
 	obj.VerificationCode = verification_code
 
 	emailData := EmailData{
-		URL:       os.Getenv("ORIGIN") + "/verifyemail/?code=" + code + "&id=" + string(obj.ID),
+		URL:       os.Getenv("DOMAIN_EMAIL") + "/verifyemail/?code=" + code + "&id=" + string(obj.ID),
 		FirstName: obj.Name,
 		Subject:   "Verifikasi code kamu!",
 	}

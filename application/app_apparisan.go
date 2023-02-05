@@ -59,7 +59,12 @@ func (apparisan) Run() error {
 
 	x := arisanapi.NewGinController(log, cfg)
 	_, err := os.LookupEnv("PORT")
-
+	corsConfig := cors.DefaultConfig()
+	Origin := os.Getenv("ORIGIN")
+	OriginUrl := Origin
+	corsConfig.AllowOrigins = []string{OriginUrl}
+	corsConfig.AllowCredentials = true
+	httpHandler.Router.Use(cors.New(corsConfig))
 	x.AddUsecase(
 		//
 		sendemailconfirm.NewUsecase(datasource),
@@ -82,16 +87,11 @@ func (apparisan) Run() error {
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)
-	corsConfig := cors.DefaultConfig()
-	Origin := os.Getenv("ORIGIN")
-	OriginUrl := Origin
-	corsConfig.AllowOrigins = []string{OriginUrl}
-	corsConfig.AllowCredentials = true
 
 	if err {
 		httpHandler.Router.Run()
 	}
-	httpHandler.Router.Use(cors.New(corsConfig))
+
 	httpHandler.Router.Use(sentrygin.New(sentrygin.Options{}))
 
 	httpHandler.RunWithGracefullyShutdown()
