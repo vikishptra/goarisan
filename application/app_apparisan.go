@@ -58,7 +58,9 @@ func (apparisan) Run() error {
 
 	x := arisanapi.NewGinController(log, cfg)
 	_, err := os.LookupEnv("PORT")
-
+	if err {
+		httpHandler.Router.Run()
+	}
 	x.AddUsecase(
 		//
 		sendemailconfirm.NewUsecase(datasource),
@@ -81,9 +83,6 @@ func (apparisan) Run() error {
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)
-	if err {
-		httpHandler.Router.Run()
-	}
 	httpHandler.Router.Use(sentrygin.New(sentrygin.Options{}))
 
 	httpHandler.RunWithGracefullyShutdown()
