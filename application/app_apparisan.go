@@ -8,6 +8,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-contrib/cors"
 
 	"vikishptra/domain_goarisan/controller/arisanapi"
 	"vikishptra/domain_goarisan/gateway/withgorm"
@@ -55,8 +56,10 @@ func (apparisan) Run() error {
 
 	httpHandler := server.NewGinHTTPHandler(log, cfg.Servers[appName].Address, appData)
 	LogSentry()
-	_, err := os.LookupEnv("PORT")
+
 	x := arisanapi.NewGinController(log, cfg)
+	_, err := os.LookupEnv("PORT")
+
 	x.AddUsecase(
 		//
 		sendemailconfirm.NewUsecase(datasource),
@@ -79,10 +82,16 @@ func (apparisan) Run() error {
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)
+	corsConfig := cors.DefaultConfig()
+	Origin := os.Getenv("ORIGIN")
+	OriginUrl := Origin
+	corsConfig.AllowOrigins = []string{OriginUrl}
+	corsConfig.AllowCredentials = true
+
 	if err {
 		httpHandler.Router.Run()
 	}
-
+	httpHandler.Router.Use(cors.New(corsConfig))
 	httpHandler.Router.Use(sentrygin.New(sentrygin.Options{}))
 
 	httpHandler.RunWithGracefullyShutdown()
