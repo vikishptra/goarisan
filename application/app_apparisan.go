@@ -3,7 +3,6 @@ package application
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -57,7 +56,6 @@ func (apparisan) Run() error {
 	LogSentry()
 
 	x := arisanapi.NewGinController(log, cfg)
-	_, err := os.LookupEnv("PORT")
 
 	x.AddUsecase(
 		//
@@ -82,9 +80,6 @@ func (apparisan) Run() error {
 	)
 	x.RegisterRouter(httpHandler.Router)
 
-	if err {
-		httpHandler.Router.Run()
-	}
 	httpHandler.Router.Use(sentrygin.New(sentrygin.Options{}))
 
 	httpHandler.RunWithGracefullyShutdown()
