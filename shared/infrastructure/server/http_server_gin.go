@@ -20,19 +20,18 @@ type GinHTTPHandler struct {
 func NewGinHTTPHandler(log logger.Logger, address string, appData gogen.ApplicationData) GinHTTPHandler {
 
 	router := gin.Default()
-
 	// PING API
 	router.Use(cors.New(cors.Config{
-		ExposeHeaders:   []string{"Data-Length"},
-		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"},
-		AllowAllOrigins: true,
-		AllowHeaders:    []string{"Content-Type", "Authorization"},
-		MaxAge:          12 * time.Hour,
+		ExposeHeaders:    []string{"Data-Length"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		MaxAge:           12 * time.Hour,
+		AllowCredentials: true,
+		AllowOrigins:     []string{"http://localhost:3000"},
 	}))
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, appData)
 	})
-
 	// contentStatic, _ := fs.Sub(web.StaticFiles, "dist")
 	// router.StaticFS("/web", http.FS(contentStatic))
 
