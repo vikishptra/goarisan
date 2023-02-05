@@ -27,7 +27,7 @@ func NewGinHTTPHandler(log logger.Logger, address string, appData gogen.Applicat
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		MaxAge:           12 * time.Hour,
 		AllowCredentials: true,
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"http://localhost:3000", "https://goarisan-staging.up.railway.app"},
 	}))
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, appData)

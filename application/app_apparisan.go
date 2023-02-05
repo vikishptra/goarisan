@@ -55,7 +55,7 @@ func (apparisan) Run() error {
 
 	httpHandler := server.NewGinHTTPHandler(log, cfg.Servers[appName].Address, appData)
 	LogSentry()
-
+	_, err := os.LookupEnv("PORT")
 	x := arisanapi.NewGinController(log, cfg)
 	x.AddUsecase(
 		//
@@ -79,7 +79,6 @@ func (apparisan) Run() error {
 		runusercreate.NewUsecase(datasource),
 	)
 	x.RegisterRouter(httpHandler.Router)
-	_, err := os.LookupEnv("PORT")
 	if err {
 		httpHandler.Router.Run()
 	}
