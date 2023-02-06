@@ -4,6 +4,8 @@
 
 FROM golang:1.18.2-alpine3.15 as builder
 
+RUN go install github.com/cosmtrek/air@latest
+
 RUN apk update && apk add --no-cache git
 
 WORKDIR /app
@@ -27,6 +29,6 @@ COPY --from=builder /app/config.json /app
 
 ENTRYPOINT ["vikishptra", "apparisan"]
 
-CMD [ "./vikishptra","apparisan"] --v
+# CMD [ "./vikishptra","apparisan"] --v
 
-# CMD ["air", "-c", ".air.toml", "apparisan"]
+CMD ["air", "-c", ".air.toml", "apparisan"]
