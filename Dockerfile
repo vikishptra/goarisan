@@ -10,8 +10,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN go install github.com/cosmtrek/air@latest
-
 RUN go mod tidy
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-X 'main.Version=v1.0.0'" .
@@ -29,6 +27,6 @@ COPY --from=builder /app/config.json /app
 
 ENTRYPOINT ["vikishptra", "apparisan"]
 
-# CMD [ "./vikishptra","apparisan"] --v
+CMD [ "./vikishptra","apparisan"] --v
 
-CMD ["air", "-c", ".air.toml",]
+# CMD ["air", "-c", ".air.toml", "apparisan"]
