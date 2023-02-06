@@ -22,6 +22,6 @@ func (r *runLogoutUserInteractor) Execute(ctx context.Context, req InportRequest
 		return nil, err
 	}
 
-	res.Message = "ok success logout"
+	res.Message = "ok berhasil logout"
 	return res, nil
 }

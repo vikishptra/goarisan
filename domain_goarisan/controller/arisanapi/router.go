@@ -35,6 +35,7 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	router.GET("/refresh-token", r.refreshtokenjwtHandler())
 	router.GET("/verifyemail", r.verifyEmailHandler())
 	router.POST("/confirm", RateLimitMiddleware(bucket), r.sendemailconfirmHandler())
+	router.POST("/logout", r.runLogoutUserHandler())
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
 	})
@@ -46,8 +47,6 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.PUT("/user/", r.runUserUpdateHandler())
 	resource.PUT("/user/money", r.runupdateusermoneyHandler())
 	resource.GET("/user/", r.findOneUserByIDHandler())
-	resource.POST("/user/logout", r.runLogoutUserHandler())
-
 	//grup
 	resource.POST("/user/grup", r.runGrupArisanCreateHandler())
 	resource.POST("/user/join-grup", r.runJoinDetailGrupArisanHandler())

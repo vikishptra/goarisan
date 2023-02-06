@@ -8,6 +8,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -29,25 +30,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	dbUser := os.Getenv("MYSQLUSER")
-	dbPassword := os.Getenv("MYSQLPASSWORD")
-	dbHost := os.Getenv("MYSQLHOST")
-	dbPort := os.Getenv("MYSQLPORT")
-	database := os.Getenv("MYSQLDATABASE")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	// dbUser := os.Getenv("MYSQLUSER")
+	// dbPassword := os.Getenv("MYSQLPASSWORD")
+	// dbHost := os.Getenv("MYSQLHOST")
+	// dbPort := os.Getenv("MYSQLPORT")
+	// database := os.Getenv("MYSQLDATABASE")
 
-	// DbHost := os.Getenv("DB_HOST")
-	// DbUser := os.Getenv("DB_USER")
-	// DbPassword := os.Getenv("DB_PASSWORD")
-	// DbName := os.Getenv("DB_NAME")
-	// DbPort := os.Getenv("DB_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -82,6 +83,7 @@ func (r *Gateway) SaveUser(ctx context.Context, obj *entity.User) error {
 
 func (r *Gateway) FindUserByID(ctx context.Context, UserID vo.UserID) (*entity.User, error) {
 	r.log.Info(ctx, "called")
+
 	var user entity.User
 	if err := r.Db.First(&user, "id = ?", UserID); err.RecordNotFound() {
 		return nil, errorenum.DataNotFound
@@ -228,7 +230,7 @@ func (r *Gateway) FindEmail(ctx context.Context, email string) (*entity.User, er
 func (r *Gateway) FindEmailConfirmUser(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
 	if err := r.Db.Model(&user).Where("email = ? AND is_active = 0", email).Take(&user); err.RecordNotFound() {
-		return nil, errorenum.SepertinyaAdaYangSalahDariAnda
+		return nil, errorenum.EmailSudahDiKonfirmasi
 	}
 	return &user, nil
 }
@@ -395,10 +397,13 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 	currentTime := time.Now()
 	then := user.Created.Add(time.Duration(24) * time.Hour)
 	if currentTime.After(then) {
+		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
+			return errorenum.SepertinyaAdaYangSalahDariAnda
+		}
 		return errorenum.KonfirmasiEmailAndaSudahKadaluawarsa
 	}
 	if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("is_active", 1); err.RecordNotFound() {
-		return errorenum.SomethingError
+		return errorenum.SepertinyaAdaYangSalahDariAnda
 	}
 
 	return nil

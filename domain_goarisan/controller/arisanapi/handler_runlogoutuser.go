@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"vikishptra/domain_goarisan/model/errorenum"
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
 	"vikishptra/shared/gogen"
 	"vikishptra/shared/infrastructure/logger"
@@ -35,7 +36,11 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 
 		var req InportRequest
 		id, _ := token.ExtractTokenID(c)
-
+		refreshToken := token.ExtractTokenCookie(c)
+		if refreshToken == "" {
+			c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(errorenum.GabisaAksesBro, traceID))
+			return
+		}
 		req.Token = id
 
 		r.log.Info(ctx, util.MustJSON(req))

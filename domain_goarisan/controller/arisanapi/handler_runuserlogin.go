@@ -64,7 +64,8 @@ func (r *ginController) runUserLoginHandler() gin.HandlerFunc {
 		jsonRes.RefreshToken = res.RefreshToken
 		domain := os.Getenv("ORIGIN")
 		timeToken := 24 * 60 * 60 * 100
-		c.SetCookie("refresh_token", res.RefreshToken, timeToken, "/", domain, false, true)
+		httpOnly := true
+		c.SetCookie("refresh_token", res.RefreshToken, timeToken, "/", domain, false, httpOnly)
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 
