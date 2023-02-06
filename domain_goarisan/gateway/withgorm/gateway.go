@@ -399,6 +399,9 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
 			return errorenum.SepertinyaAdaYangSalahDariAnda
 		}
+		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("verification_code", ""); err.RecordNotFound() {
+			return errorenum.SepertinyaAdaYangSalahDariAnda
+		}
 		return errorenum.KonfirmasiEmailAndaSudahKadaluawarsa
 	}
 	if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("is_active", 1); err.RecordNotFound() {
