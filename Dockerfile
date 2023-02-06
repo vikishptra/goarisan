@@ -29,6 +29,6 @@ COPY --from=builder /app/config.json /app
 
 ENTRYPOINT ["vikishptra", "apparisan"]
 
-# CMD [ "./vikishptra","apparisan"] --v
+CMD [ "./vikishptra","apparisan"] --v
 
-CMD ["air", "-c", ".air.toml", "apparisan"]
+# CMD ["air", "-c", ".air.toml", "apparisan"]
