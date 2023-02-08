@@ -11,7 +11,7 @@
   },
   "servers": {
     "apparisan": {
-      "address": ":8002"
+      "address": ":8001"
     }
   }
 }

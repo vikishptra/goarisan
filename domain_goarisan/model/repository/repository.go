@@ -17,6 +17,7 @@ type SaveUserRepo interface {
 
 type FindUserByIDRepo interface {
 	FindUserByID(ctx context.Context, UserID vo.UserID) (*entity.User, error)
+	FindEmailUser(ctx context.Context, email string) (*entity.User, error)
 }
 
 type SaveGrupArisanRepo interface {

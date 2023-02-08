@@ -22,10 +22,17 @@ func NewUsecase(outputPort Outport) Inport {
 func (r *sendemailconfirmInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 	res := &InportResponse{}
 	code := randstr.String(4)
+	if err := entity.CheckEmailValid(req.Email); err != nil {
+		return nil, err
+	}
+	if err := entity.CheckEmailDomain(req.Email); err != nil {
+		return nil, err
+	}
 	userObj, err := r.outport.FindEmailConfirmUser(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
+
 	emailData := entity.EmailData{
 		URL:       os.Getenv("DOMAIN_EMAIL") + "/verifyemail/?code=" + code + "&id=" + userObj.ID.String(),
 		FirstName: userObj.Name,

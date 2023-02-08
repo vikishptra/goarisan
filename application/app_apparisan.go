@@ -16,6 +16,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/findgrupbyiduser"
 	"vikishptra/domain_goarisan/usecase/findoneuserbyid"
 	"vikishptra/domain_goarisan/usecase/refreshtokenjwt"
+	"vikishptra/domain_goarisan/usecase/runchangepasswordwithgmail"
 	"vikishptra/domain_goarisan/usecase/rungruparisancreate"
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
@@ -61,6 +62,7 @@ func (apparisan) Run() error {
 
 	x.AddUsecase(
 		//
+		runchangepasswordwithgmail.NewUsecase(datasource),
 		sendemailconfirm.NewUsecase(datasource),
 		verifyemail.NewUsecase(datasource),
 		refreshtokenjwt.NewUsecase(datasource),

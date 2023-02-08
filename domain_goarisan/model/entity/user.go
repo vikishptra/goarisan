@@ -63,17 +63,17 @@ func (r *User) ValidateUserCreate(req UserCreateRequest) error {
 		return err
 	}
 	//hashpassword
-	if err := checkEmailValid(req.Email); err != nil {
+	if err := CheckEmailValid(req.Email); err != nil {
 		return err
 	}
-	if err := checkEmailDomain(req.Email); err != nil {
+	if err := CheckEmailDomain(req.Email); err != nil {
 		return err
 	}
 	return nil
 
 }
 
-func checkEmailValid(email string) error {
+func CheckEmailValid(email string) error {
 	emailRegex, err := regexp.Compile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 	if err != nil {
 		return errorenum.EmailIsNotValid
@@ -88,7 +88,7 @@ func checkEmailValid(email string) error {
 	return nil
 }
 
-func checkEmailDomain(email string) error {
+func CheckEmailDomain(email string) error {
 	i := strings.Index(email, "@")
 	host := email[i+1:]
 	// func LookupMX(name string) ([]*MX, error)
@@ -243,4 +243,20 @@ func (r *User) HashPassword(req UserCreateRequest) error {
 func SendEmailConfirmUser(code string, obj *User) {
 	verification_code := util.Encode(code)
 	obj.VerificationCode = verification_code
+}
+
+func ChangePasswordWithEmail(user *User) {
+
+	code := randstr.String(4)
+
+	verification_code := util.Encode(code)
+	user.VerificationCode = verification_code
+	emailData := EmailData{
+		URL:       os.Getenv("DOMAIN_EMAIL") + "/newpassword/?code=" + code + "&id=" + string(user.ID),
+		FirstName: user.Name,
+		Subject:   "New Password Kamu!",
+	}
+
+	go SendEmail(user, user.Email, &emailData)
+
 }

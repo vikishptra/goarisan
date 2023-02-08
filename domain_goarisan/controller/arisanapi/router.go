@@ -36,6 +36,7 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	router.GET("/verifyemail", r.verifyEmailHandler())
 	router.POST("/confirm", RateLimitMiddleware(bucket), r.sendemailconfirmHandler())
 	router.POST("/logout", r.runLogoutUserHandler())
+	router.POST("/change/password", RateLimitMiddleware(bucket), r.runChangePasswordWithGmailHandler())
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
 	})

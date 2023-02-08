@@ -229,10 +229,19 @@ func (r *Gateway) FindEmail(ctx context.Context, email string) (*entity.User, er
 func (r *Gateway) FindEmailConfirmUser(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
 	if err := r.Db.Model(&user).Where("email = ? AND is_active = 0", email).Take(&user); err.RecordNotFound() {
-		return nil, errorenum.EmailSudahDiKonfirmasi
+		return nil, errorenum.EmailAndaTidakTerdaftarPergiUntukDaftarAkunAnda
 	}
 	return &user, nil
 }
+
+func (r *Gateway) FindEmailUser(ctx context.Context, email string) (*entity.User, error) {
+	var user entity.User
+	if err := r.Db.Model(&user).Where("email = ?", email).Take(&user); err.RecordNotFound() {
+		return nil, errorenum.EmailIsNotValid
+	}
+	return &user, nil
+}
+
 func (r *Gateway) RunLogin(ctx context.Context, email, password string) (string, string, *entity.User, error) {
 	var user entity.User
 	var UserPassword *entity.User
