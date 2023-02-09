@@ -29,11 +29,11 @@ func (r *runChangePasswordWithGmailInteractor) Execute(ctx context.Context, req 
 		return nil, err
 	}
 	userObj, err := r.outport.FindEmailUser(ctx, req.Email)
-	if !userObj.IsActive {
-		return nil, errorenum.EmailBelumDiKonfirmasi
-	}
 	if err != nil {
 		return nil, err
+	}
+	if !userObj.IsActive {
+		return nil, errorenum.EmailBelumDiKonfirmasi
 	}
 	go entity.ChangePasswordWithEmail(userObj)
 	userObj.Created = time.Now()
