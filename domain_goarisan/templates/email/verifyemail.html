@@ -1,0 +1,51 @@
+{{template "base" .}} {{define "content"}}
+<table role="presentation" class="main">
+  <!-- START MAIN CONTENT AREA -->
+  <tr>
+    <td class="wrapper">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <p style="font-weight: bold;">Hi {{ .FirstName}},</p>
+            <p>Terima kasih telah mendaftar di aplikasi arisan, Yuk klik tombol di bawah untuk konfirmasi email kamu! 
+              Dengan konfirmasi, kamu bisa menggunakan aplikasi arisan.</p>
+            <table
+              role="presentation"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              class="btn btn-primary"
+            >
+              <tbody>
+                <tr>
+                  <td align="left">
+                    <table
+                      role="presentation"
+                      border="0"
+                      cellpadding="0"
+                      cellspacing="0"
+                    >
+                      <tbody>
+                        <tr>
+                          <td>
+                            <a href="{{.URL}}" target="_blank" rel="nofollow noopener noreferrer" target="_blank"
+                              >Konfirmasi Email</a
+                            >
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p>Salam,<br>Tim Arisan</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- END MAIN CONTENT AREA -->
+</table>
+{{end}}

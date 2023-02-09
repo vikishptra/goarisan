@@ -133,14 +133,15 @@ func NewUser(req UserCreateRequest) (*User, error) {
 	obj.Name = req.Name
 	obj.Money = 0
 	obj.VerificationCode = verification_code
-
+	file := "verifyemail.html"
+	temp := "domain_goarisan/templates/email"
 	emailData := EmailData{
 		URL:       os.Getenv("DOMAIN_EMAIL") + "/verifyemail/?code=" + code + "&id=" + string(obj.ID),
 		FirstName: obj.Name,
 		Subject:   "Verifikasi code kamu!",
 	}
 
-	go SendEmail(&obj, req.Email, &emailData)
+	go SendEmail(&obj, req.Email, &emailData, file, temp)
 
 	return &obj, nil
 }
@@ -248,7 +249,8 @@ func SendEmailConfirmUser(code string, obj *User) {
 func ChangePasswordWithEmail(user *User) {
 
 	code := randstr.String(4)
-
+	file := "verifypassword.html"
+	temp := "domain_goarisan/templates/password"
 	verification_code := util.Encode(code)
 	user.VerificationCode = verification_code
 	emailData := EmailData{
@@ -257,6 +259,6 @@ func ChangePasswordWithEmail(user *User) {
 		Subject:   "New Password Kamu!",
 	}
 
-	go SendEmail(user, user.Email, &emailData)
+	go SendEmail(user, user.Email, &emailData, file, temp)
 
 }

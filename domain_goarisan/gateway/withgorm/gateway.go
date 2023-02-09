@@ -228,6 +228,9 @@ func (r *Gateway) FindEmail(ctx context.Context, email string) (*entity.User, er
 }
 func (r *Gateway) FindEmailConfirmUser(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
+	if err := r.Db.Model(&user).Where("email = ? AND is_active = 1", email).Take(&user); !err.RecordNotFound() {
+		return nil, errorenum.EmailSudahDiKonfirmasi
+	}
 	if err := r.Db.Model(&user).Where("email = ? AND is_active = 0", email).Take(&user); err.RecordNotFound() {
 		return nil, errorenum.EmailAndaTidakTerdaftarPergiUntukDaftarAkunAnda
 	}

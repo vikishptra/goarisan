@@ -32,7 +32,8 @@ func (r *sendemailconfirmInteractor) Execute(ctx context.Context, req InportRequ
 	if err != nil {
 		return nil, err
 	}
-
+	file := "verifyemail.html"
+	temp := "domain_goarisan/templates/email"
 	emailData := entity.EmailData{
 		URL:       os.Getenv("DOMAIN_EMAIL") + "/verifyemail/?code=" + code + "&id=" + userObj.ID.String(),
 		FirstName: userObj.Name,
@@ -42,7 +43,7 @@ func (r *sendemailconfirmInteractor) Execute(ctx context.Context, req InportRequ
 	if err := r.outport.SaveUser(ctx, userObj); err != nil {
 		return nil, err
 	}
-	go entity.SendEmail(userObj, req.Email, &emailData)
+	go entity.SendEmail(userObj, req.Email, &emailData, file, temp)
 
 	res.Message = "ok success mohon ke email anda untuk verifikasi akun anda yang sudah di kirimkan"
 

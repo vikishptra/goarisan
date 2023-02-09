@@ -27,7 +27,7 @@ const (
 	DataArisanAndaSudahBerakhir                          apperror.ErrorType = "ER0021 data arisan anda sudah berakhir"
 	DataUserMasihAdaSaldoArisan                          apperror.ErrorType = "ER0022 data user masih ada saldo arisan"
 	AndaAdalahAdmin                                      apperror.ErrorType = "ER0023 anda adalah owner"
-	EmailIsNotValid                                      apperror.ErrorType = "ER0024 email is not valid"
+	EmailIsNotValid                                      apperror.ErrorType = "ER0024 email tidak valid"
 	EmailLengthIsTooLong                                 apperror.ErrorType = "ER0025 email length is too long"
 	CouldNotFindEmail                                    apperror.ErrorType = "ER0026 could not find email"
 	UsernameAndaSudahDigunakan                           apperror.ErrorType = "ER0027 username anda sudah digunakan"
