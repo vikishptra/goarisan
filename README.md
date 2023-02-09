@@ -1,5 +1,5 @@
 # GO-ARISAN
-
+HE
 
 GO-ARISAN adalah sebuah microservice arisan yang di dalam nya terdapat operasi untuk melakukan arisan yang sudah menggunakan JWT Authorization
 
