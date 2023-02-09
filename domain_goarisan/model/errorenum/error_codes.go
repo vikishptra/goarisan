@@ -47,4 +47,5 @@ const (
 	TooManyRequests                                      apperror.ErrorType = "ER0041 too many requests"
 	PasswordTidakSama                                    apperror.ErrorType = "ER0042 password tidak sama"
 	EmailAndaTidakTerdaftarPergiUntukDaftarAkunAnda      apperror.ErrorType = "ER0043 email anda tidak terdaftar pergi untuk daftar akun anda"
+	TokenAndaSudahKadaluawarsa                           apperror.ErrorType = "ER0044 token anda sudah kadaluawarsa"
 )

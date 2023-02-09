@@ -35,7 +35,7 @@ func (r *ginController) runLogoutUserHandler() gin.HandlerFunc {
 		ctx := logger.SetTraceID(context.Background(), traceID)
 
 		var req InportRequest
-		id, _ := token.ExtractTokenID(c)
+		id, _ := token.ExtractTokenIDCookies(c)
 		refreshToken := token.ExtractTokenCookie(c)
 		if refreshToken == "" {
 			c.JSON(http.StatusUnauthorized, payload.NewErrorResponse(errorenum.GabisaAksesBro, traceID))

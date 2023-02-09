@@ -55,7 +55,6 @@ func (r *ginController) runChangePasswordWithGmailHandler() gin.HandlerFunc {
 
 		var jsonRes response
 		jsonRes.Message = res.Message
-
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 

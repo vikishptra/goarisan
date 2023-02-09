@@ -3,6 +3,7 @@ package sendemailconfirm
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/thanhpk/randstr"
 
@@ -40,6 +41,7 @@ func (r *sendemailconfirmInteractor) Execute(ctx context.Context, req InportRequ
 		Subject:   "Verifikasi code kamu!",
 	}
 	entity.SendEmailConfirmUser(code, userObj)
+	userObj.Created = time.Now()
 	if err := r.outport.SaveUser(ctx, userObj); err != nil {
 		return nil, err
 	}

@@ -30,24 +30,32 @@ func NewGinController(log logger.Logger, cfg *config.Config) gogen.RegisterRoute
 
 func (r *ginController) RegisterRouter(router selectedRouter) {
 	bucket := ratelimit.NewBucket(time.Minute, 5)
+	//umum
 	router.POST("/register", r.runUserCreateHandler())
 	router.POST("/login", r.runUserLoginHandler())
 	router.GET("/refresh-token", r.refreshtokenjwtHandler())
-	router.GET("/verifyemail", r.verifyEmailHandler())
-	router.POST("/confirm", RateLimitMiddleware(bucket), r.sendemailconfirmHandler())
 	router.POST("/logout", r.runLogoutUserHandler())
-	router.POST("/change/password", RateLimitMiddleware(bucket), r.runChangePasswordWithGmailHandler())
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Vicky Sahputra GO-ARISAN"})
 	})
+
+	//email
+	router.GET("/verifyemail", r.verifyEmailHandler())
+	router.POST("/confirm", RateLimitMiddleware(bucket), r.sendemailconfirmHandler())
+
+	//password
+	router.POST("/change/password", RateLimitMiddleware(bucket), r.runChangePasswordWithGmailHandler())
+	router.GET("/change/password", r.runverifynewpasswordemailHandler())
+	router.POST("/new/password", r.runnewpasswordconfirmemailHandler())
+
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama
-
 	//user
 	resource.PUT("/user/", r.runUserUpdateHandler())
 	resource.PUT("/user/money", r.runupdateusermoneyHandler())
 	resource.GET("/user/", r.findOneUserByIDHandler())
+
 	//grup
 	resource.POST("/user/grup", r.runGrupArisanCreateHandler())
 	resource.POST("/user/join-grup", r.runJoinDetailGrupArisanHandler())

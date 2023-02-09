@@ -13,6 +13,8 @@ type SaveUserRepo interface {
 	FindEmail(ctx context.Context, email string) (*entity.User, error)
 	RunVerifyEmail(ctx context.Context, id, code string) error
 	FindEmailConfirmUser(ctx context.Context, email string) (*entity.User, error)
+	RunVerifyNewPasswordEmail(ctx context.Context, id, code string) error
+	RunNewPasswordWithEmail(ctx context.Context, id, code string) (*entity.User, error)
 }
 
 type FindUserByIDRepo interface {
@@ -43,7 +45,7 @@ type FindOneGrupByOwnerRepo interface {
 
 type RunLoginRepo interface {
 	RunLogin(ctx context.Context, email, password string) (string, string, *entity.User, error)
-	RunLogout(ctx context.Context, user vo.UserID) error
+	RunLogout(ctx context.Context, user string) error
 	RunRefreshTokenJwt(ctx context.Context, IDuser vo.UserID, tokens string) (string, error)
 }
 

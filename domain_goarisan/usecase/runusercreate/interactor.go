@@ -33,7 +33,7 @@ func (r *runUserCreateInteractor) Execute(ctx context.Context, req InportRequest
 	if err != nil {
 		return nil, err
 	}
-	if err := userObj.HashPassword(req.UserCreateRequest); err != nil {
+	if err := userObj.HashPassword(req.Password); err != nil {
 		return nil, err
 	}
 

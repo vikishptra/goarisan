@@ -8,6 +8,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -29,25 +30,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	dbUser := os.Getenv("MYSQLUSER")
-	dbPassword := os.Getenv("MYSQLPASSWORD")
-	dbHost := os.Getenv("MYSQLHOST")
-	dbPort := os.Getenv("MYSQLPORT")
-	database := os.Getenv("MYSQLDATABASE")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	// dbUser := os.Getenv("MYSQLUSER")
+	// dbPassword := os.Getenv("MYSQLPASSWORD")
+	// dbHost := os.Getenv("MYSQLHOST")
+	// dbPort := os.Getenv("MYSQLPORT")
+	// database := os.Getenv("MYSQLDATABASE")
 
-	// DbHost := os.Getenv("DB_HOST")
-	// DbUser := os.Getenv("DB_USER")
-	// DbPassword := os.Getenv("DB_PASSWORD")
-	// DbName := os.Getenv("DB_NAME")
-	// DbPort := os.Getenv("DB_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -270,9 +271,9 @@ func (r *Gateway) RunLogin(ctx context.Context, email, password string) (string,
 	return refreshToken, access_token, &user, nil
 }
 
-func (r *Gateway) RunLogout(ctx context.Context, user vo.UserID) error {
+func (r *Gateway) RunLogout(ctx context.Context, user string) error {
 
-	if err := r.Db.Model(entity.User{}).Where("id = ?", user).Update("refresh_token", ""); err.Error != nil {
+	if err := r.Db.Model(entity.User{}).Where("id = ?", user).Update("refresh_token", ""); err.RecordNotFound() {
 		return errorenum.SomethingError
 	}
 
@@ -421,5 +422,37 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 	}
 
 	return nil
+
+}
+
+func (r *Gateway) RunVerifyNewPasswordEmail(ctx context.Context, id, code string) error {
+	var user entity.User
+	verification_code := util.Encode(code)
+	if err := r.Db.First(&user, "id = ? AND verification_code = ?", id, verification_code); err.RecordNotFound() {
+		return errorenum.SepertinyaAdaYangSalahDariAnda
+	}
+	currentTime := time.Now()
+	then := user.Created.Add(time.Duration(1) * time.Hour)
+	if currentTime.After(then) {
+		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
+			return errorenum.SepertinyaAdaYangSalahDariAnda
+		}
+		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("verification_code", ""); err.RecordNotFound() {
+			return errorenum.SepertinyaAdaYangSalahDariAnda
+		}
+		return errorenum.TokenAndaSudahKadaluawarsa
+	}
+
+	return nil
+
+}
+
+func (r *Gateway) RunNewPasswordWithEmail(ctx context.Context, id, code string) (*entity.User, error) {
+	var user entity.User
+	verification_code := util.Encode(code)
+	if err := r.Db.First(&user, "id = ? AND verification_code = ?", id, verification_code); err.RecordNotFound() {
+		return nil, errorenum.HayoMauNgapain
+	}
+	return &user, nil
 
 }

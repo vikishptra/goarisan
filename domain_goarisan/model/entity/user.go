@@ -2,7 +2,6 @@ package entity
 
 import (
 	"errors"
-	"html"
 	"net"
 	"os"
 	"regexp"
@@ -229,15 +228,15 @@ func ValidateName(nama string) error {
 	return nil
 }
 
-func (r *User) HashPassword(req UserCreateRequest) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+func (r *User) HashPassword(password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	r.Password = string(hashedPassword)
 
 	//hapusspace
-	r.Name = html.EscapeString(strings.TrimSpace(req.Name))
+	// r.Name = html.EscapeString(strings.TrimSpace(req.Name))
 	return nil
 }
 
@@ -247,18 +246,26 @@ func SendEmailConfirmUser(code string, obj *User) {
 }
 
 func ChangePasswordWithEmail(user *User) {
-
 	code := randstr.String(4)
 	file := "verifypassword.html"
 	temp := "domain_goarisan/templates/password"
 	verification_code := util.Encode(code)
 	user.VerificationCode = verification_code
 	emailData := EmailData{
-		URL:       os.Getenv("DOMAIN_EMAIL") + "/newpassword/?code=" + code + "&id=" + string(user.ID),
+		URL:       os.Getenv("DOMAIN_EMAIL") + "/change/password?code=" + code + "&id=" + string(user.ID),
 		FirstName: user.Name,
 		Subject:   "New Password Kamu!",
 	}
 
 	go SendEmail(user, user.Email, &emailData, file, temp)
+}
 
+func (r *User) NewPasswordWithEmail(password, confirmPassword string) error {
+
+	if password != confirmPassword {
+		return errorenum.PasswordTidakSama
+	}
+	r.Password = password
+
+	return nil
 }

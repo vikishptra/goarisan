@@ -21,6 +21,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runjoindetailgruparisan"
 	"vikishptra/domain_goarisan/usecase/runkocokgruparisan"
 	"vikishptra/domain_goarisan/usecase/runlogoutuser"
+	"vikishptra/domain_goarisan/usecase/runnewpasswordconfirmemail"
 	"vikishptra/domain_goarisan/usecase/runupdatdetailgruparisans"
 	"vikishptra/domain_goarisan/usecase/runupdategruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/runupdateownergrup"
@@ -28,6 +29,7 @@ import (
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
+	"vikishptra/domain_goarisan/usecase/runverifynewpasswordemail"
 	"vikishptra/domain_goarisan/usecase/sendemailconfirm"
 	"vikishptra/domain_goarisan/usecase/verifyemail"
 	"vikishptra/shared/gogen"
@@ -62,6 +64,8 @@ func (apparisan) Run() error {
 
 	x.AddUsecase(
 		//
+		runnewpasswordconfirmemail.NewUsecase(datasource),
+		runverifynewpasswordemail.NewUsecase(datasource),
 		runchangepasswordwithgmail.NewUsecase(datasource),
 		sendemailconfirm.NewUsecase(datasource),
 		verifyemail.NewUsecase(datasource),
