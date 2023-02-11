@@ -1,0 +1,6 @@
+POST http://localhost:8001/api/v1/payment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NzYxNDMyODYsInVzZXJfaWQiOiIwOGNmZjg1My1iYWExLTQ4NTYtYWIxNC03ZDc0OThmMWQ1ZGYiLCJ1dWlkIjoiY2Y0ZTMxZTctMzRiYi00NGI4LWEzOTQtY2VjZmY5MzQzYzFmIn0._sM6GJeNEEdQb3dt-aZzG1W5u66vXmVStYug3wlP_58
+
+{ 
+    "money_user": 20000
+}
