@@ -254,7 +254,7 @@ func ChangePasswordWithEmail(user *User) {
 	emailData := EmailData{
 		URL:       os.Getenv("DOMAIN_EMAIL") + "/change/password?code=" + code + "&id=" + string(user.ID),
 		FirstName: user.Name,
-		Subject:   "New Password Kamu!",
+		Subject:   "Password Baru Kamu!",
 	}
 
 	go SendEmail(user, user.Email, &emailData, file, temp)
