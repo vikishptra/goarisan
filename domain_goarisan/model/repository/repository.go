@@ -65,3 +65,9 @@ type DeleteDetailGrupArisanRepo interface {
 type RunUpdateOwnerGrupRepo interface {
 	RunUpdateOwnerGrup(ctx context.Context, IDUser vo.UserID, IDGrup vo.GruparisanID, IDOwner vo.UserID) (*entity.Gruparisan, error)
 }
+
+type PaymentArisanRepo interface {
+	ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation) ([]any, error)
+	SavePayment(ctx context.Context, obj *entity.Transcation) ([]any, error)
+	MidtransGateway()
+}

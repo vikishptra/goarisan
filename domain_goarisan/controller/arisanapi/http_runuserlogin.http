@@ -1,7 +1,7 @@
-POST http://localhost:8002/login
+POST http://localhost:8001/login
 Content-Type: application/json 
 
 { 
-    "email":"a123@gmail.com",
+    "email":"vikisahputra123@gmail.com",
     "password":"Vikiviki17-"
 }

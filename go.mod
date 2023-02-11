@@ -18,7 +18,7 @@ require (
 
 require (
 	github.com/juju/ratelimit v1.0.2
-	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af
+	github.com/midtrans/midtrans-go v1.3.6
 )
 
 require (

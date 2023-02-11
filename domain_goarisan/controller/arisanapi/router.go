@@ -68,4 +68,7 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	resource.PUT("/user/setor-arisan/:grup", r.runupdatdetailgruparisansHandler())
 	resource.DELETE("/user/owner/:id_grup/:id_user", r.deletedetailgrupbyownerHandler())
 	resource.POST("/user/owner", r.runUpdateOwnerGrupHandler())
+
+	//payment
+	resource.POST("/payment/bank-transfer", r.runcreatepaymentmidtransHandler())
 }

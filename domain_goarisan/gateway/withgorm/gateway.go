@@ -2,12 +2,15 @@ package withgorm
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"golang.org/x/crypto/bcrypt"
 
 	"vikishptra/domain_goarisan/model/entity"
@@ -54,10 +57,11 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	if err != nil {
 		panic(err)
 	}
-	err = Db.AutoMigrate(entity.User{}, entity.Gruparisan{}, entity.DetailGrupArisan{}).Error
+	err = Db.AutoMigrate(entity.User{}, entity.Gruparisan{}, entity.DetailGrupArisan{}, entity.Transcation{}).Error
 	Db.Model(entity.Gruparisan{}).AddForeignKey("id_owner", "users(id)", "CASCADE", "CASCADE")
 	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_detail_grup", "gruparisans(id)", "CASCADE", "CASCADE")
 	Db.Model(entity.DetailGrupArisan{}).AddForeignKey("id_user", "users(id)", "CASCADE", "CASCADE")
+	Db.Model(entity.Transcation{}).AddForeignKey("id_user", "users(id)", "CASCADE", "CASCADE")
 	Db.Model(entity.User{}).AddIndex("idx_email", "email")
 	Db.Model(entity.User{}).AddIndex("idx_name", "name")
 	if err != nil {
@@ -455,4 +459,57 @@ func (r *Gateway) RunNewPasswordWithEmail(ctx context.Context, id, code string) 
 	}
 	return &user, nil
 
+}
+func (r *Gateway) MidtransGateway() {
+	midtrans.ServerKey = os.Getenv("SERVER_KEY_MIDTRANS")
+	midtrans.ClientKey = os.Getenv("CLIENT_KEY_MIDTRANS")
+}
+
+func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation) ([]any, error) {
+	r.MidtransGateway()
+	var user entity.User
+	if err := r.Db.First(&user, "id = ?", obj.IDUser); err.RecordNotFound() {
+		return nil, errorenum.HayoMauNgapain
+	}
+
+	var resultMidtrans []any
+	var c = coreapi.Client{}
+	c.New(os.Getenv("SERVER_KEY_MIDTRANS"), midtrans.Sandbox)
+	chargeReq := &coreapi.ChargeReq{
+		PaymentType: coreapi.PaymentTypeBankTransfer,
+		BankTransfer: &coreapi.BankTransferDetails{
+			Bank: midtrans.Bank(obj.Bank),
+		},
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  obj.ID.String(),
+			GrossAmt: obj.MoneyUser,
+		},
+		CustomerDetails: &midtrans.CustomerDetails{
+			Email: user.Email,
+			FName: user.Name,
+		},
+	}
+
+	res, _ := c.ChargeTransaction(chargeReq)
+	resultMidtrans = append(resultMidtrans, res)
+
+	return resultMidtrans, nil
+}
+
+func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation) ([]any, error) {
+	r.log.Info(ctx, "called")
+	resultObj, err := r.ChargeCoreApiBankTransfer(ctx, obj)
+	if err != nil {
+		return nil, err
+	}
+	resultJSON, err := json.Marshal(resultObj)
+	if err != nil {
+		return nil, err
+	}
+	obj.ResponseMidtrans = string(resultJSON)
+	if err := r.Db.Save(&obj).Error; err != nil {
+		panic(err)
+	}
+
+	return resultObj, nil
 }
