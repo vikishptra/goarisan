@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/joho/godotenv"
 	"gopkg.in/gomail.v2"
 )
 
@@ -37,10 +38,10 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 }
 
 func SendEmail(user *User, toEmail string, data *EmailData, file, templatee string) {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
 	from := os.Getenv("FromEmailAddr")
 	password := os.Getenv("SMTPpwd")
 	to := toEmail

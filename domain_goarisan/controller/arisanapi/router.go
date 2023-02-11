@@ -29,7 +29,7 @@ func NewGinController(log logger.Logger, cfg *config.Config) gogen.RegisterRoute
 }
 
 func (r *ginController) RegisterRouter(router selectedRouter) {
-	bucket := ratelimit.NewBucket(time.Minute, 5)
+	bucket := ratelimit.NewBucket(time.Minute, 25)
 	//umum
 	router.POST("/register", r.runUserCreateHandler())
 	router.POST("/login", r.runUserLoginHandler())

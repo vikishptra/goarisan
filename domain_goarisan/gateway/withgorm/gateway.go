@@ -402,11 +402,8 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 	if err := r.Db.First(&user, "id = ? AND verification_code = ?", id, verification_code); err.RecordNotFound() {
 		return errorenum.SepertinyaAdaYangSalahDariAnda
 	}
-	if user.IsActive {
-		return errorenum.EmailSudahDiKonfirmasi
-	}
 	currentTime := time.Now()
-	then := user.Created.Add(time.Duration(24) * time.Hour)
+	then := user.Created.Add(time.Duration(24) * time.Second)
 	if currentTime.After(then) {
 		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
 			return errorenum.SepertinyaAdaYangSalahDariAnda
@@ -416,7 +413,11 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 		}
 		return errorenum.KonfirmasiEmailAndaSudahKadaluawarsa
 	}
+
 	if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("is_active", 1); err.RecordNotFound() {
+		return errorenum.SepertinyaAdaYangSalahDariAnda
+	}
+	if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("verification_code", ""); err.RecordNotFound() {
 		return errorenum.SepertinyaAdaYangSalahDariAnda
 	}
 
@@ -431,7 +432,7 @@ func (r *Gateway) RunVerifyNewPasswordEmail(ctx context.Context, id, code string
 		return errorenum.SepertinyaAdaYangSalahDariAnda
 	}
 	currentTime := time.Now()
-	then := user.Created.Add(time.Duration(1) * time.Hour)
+	then := user.Created.Add(time.Duration(24) * time.Hour)
 	if currentTime.After(then) {
 		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
 			return errorenum.SepertinyaAdaYangSalahDariAnda
