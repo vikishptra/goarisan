@@ -2,13 +2,14 @@ package withgorm
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"golang.org/x/crypto/bcrypt"
@@ -32,25 +33,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	dbUser := os.Getenv("MYSQLUSER")
-	dbPassword := os.Getenv("MYSQLPASSWORD")
-	dbHost := os.Getenv("MYSQLHOST")
-	dbPort := os.Getenv("MYSQLPORT")
-	database := os.Getenv("MYSQLDATABASE")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	// dbUser := os.Getenv("MYSQLUSER")
+	// dbPassword := os.Getenv("MYSQLPASSWORD")
+	// dbHost := os.Getenv("MYSQLHOST")
+	// dbPort := os.Getenv("MYSQLPORT")
+	// database := os.Getenv("MYSQLDATABASE")
 
-	// DbHost := os.Getenv("DB_HOST")
-	// DbUser := os.Getenv("DB_USER")
-	// DbPassword := os.Getenv("DB_PASSWORD")
-	// DbName := os.Getenv("DB_NAME")
-	// DbPort := os.Getenv("DB_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -468,6 +469,12 @@ func (r *Gateway) MidtransGateway() {
 func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
 
 	r.MidtransGateway()
+	bank := req.BankTransferDetails.Bank
+	if bank != "bca" && bank != "bni" && bank != "bri" && bank != "permata" && bank != "mandiri" {
+		return nil, errorenum.BankTersebutTidakAda
+	} else if strings.TrimSpace(string(req.PaymentType)) != "bank_transfer" {
+		return nil, errorenum.SepertinyaAdaYangSalahDariAndaHarusnyaBankTransfer
+	}
 	var user entity.User
 	if err := r.Db.First(&user, "id = ?", obj.IDUser); err.RecordNotFound() {
 		return nil, errorenum.HayoMauNgapain
@@ -476,6 +483,7 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 	req.TransactionDetails.OrderID = obj.ID.String()
 	var c = coreapi.Client{}
 	c.New(os.Getenv("SERVER_KEY_MIDTRANS"), midtrans.Sandbox)
+
 	chargeReq := &coreapi.ChargeReq{
 		PaymentType:        req.PaymentType,
 		BankTransfer:       req.BankTransferDetails,
@@ -485,16 +493,20 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 			FName: user.Name,
 		},
 	}
-	// var m map[string]interface{}
 	res, err := c.ChargeTransaction(chargeReq)
-	if res.StatusCode == "505" {
-		return nil, errorenum.KoneksiAndaKurangStabilCobaLagi
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", res.StatusMessage, res.ValidationMessages)
 	}
-	if res.StatusCode != "201" {
-		return nil, err
-	}
-	if req.BankTransferDetails.Bank == "bca" {
+	obj.StatusTransaksi = res.TransactionStatus
+	switch req.BankTransferDetails.Bank {
+	case "bca":
 		resultMidtrans = entity.BCA(*res)
+	case "bni":
+		resultMidtrans = entity.BNI(*res)
+	case "bri":
+		resultMidtrans = entity.BRI(*res)
+	case "permata":
+		resultMidtrans = entity.PERMATA(*res)
 	}
 
 	return resultMidtrans, nil
@@ -508,11 +520,12 @@ func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation, req 
 		return nil, err
 	}
 
-	resultJSON, err := json.Marshal(resultObj)
-	if err != nil {
-		return nil, err
-	}
-	obj.ResponseMidtrans = string(resultJSON)
+	// resultJSON, err := json.Marshal(resultObj)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// obj.ResponseMidtrans = string(resultJSON)
+
 	if err := r.Db.Save(&obj).Error; err != nil {
 		panic(err)
 	}

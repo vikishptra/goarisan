@@ -50,4 +50,6 @@ const (
 	TokenAndaSudahKadaluawarsa                           apperror.ErrorType = "ER0044 token anda sudah kadaluawarsa"
 	SistemSedangAdaMasalahMohonDiTunggu                  apperror.ErrorType = "ER0045 sistem sedang ada masalah mohon di tunggu"
 	KoneksiAndaKurangStabilCobaLagi                      apperror.ErrorType = "ER0046 koneksi anda kurang stabil di coba lagi !"
+	BankTersebutTidakAda                                 apperror.ErrorType = "ER0047 bank tersebut tidak ada"
+	SepertinyaAdaYangSalahDariAndaHarusnyaBankTransfer   apperror.ErrorType = "ER0048 sepertinya ada yang salah dari anda harusnya payment_type:bank_transfer"
 )

@@ -51,6 +51,7 @@ func (r *ginController) runcreatepaymentmidtransHandler() gin.HandlerFunc {
 		req.TransactionDetails = jsonReq.TransactionDetails
 		req.Now = time.Now()
 		req.RandomString = util.GenerateID()
+
 		r.log.Info(ctx, util.MustJSON(req))
 
 		res, err := inport.Execute(ctx, req)
