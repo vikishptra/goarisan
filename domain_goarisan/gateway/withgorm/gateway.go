@@ -465,43 +465,49 @@ func (r *Gateway) MidtransGateway() {
 	midtrans.ClientKey = os.Getenv("CLIENT_KEY_MIDTRANS")
 }
 
-func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation) ([]any, error) {
+func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
+
 	r.MidtransGateway()
 	var user entity.User
 	if err := r.Db.First(&user, "id = ?", obj.IDUser); err.RecordNotFound() {
 		return nil, errorenum.HayoMauNgapain
 	}
-
 	var resultMidtrans []any
+	req.TransactionDetails.OrderID = obj.ID.String()
 	var c = coreapi.Client{}
 	c.New(os.Getenv("SERVER_KEY_MIDTRANS"), midtrans.Sandbox)
 	chargeReq := &coreapi.ChargeReq{
-		PaymentType: coreapi.PaymentTypeBankTransfer,
-		BankTransfer: &coreapi.BankTransferDetails{
-			Bank: midtrans.Bank(obj.Bank),
-		},
-		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  obj.ID.String(),
-			GrossAmt: obj.MoneyUser,
-		},
+		PaymentType:        req.PaymentType,
+		BankTransfer:       req.BankTransferDetails,
+		TransactionDetails: req.TransactionDetails,
 		CustomerDetails: &midtrans.CustomerDetails{
 			Email: user.Email,
 			FName: user.Name,
 		},
 	}
-
-	res, _ := c.ChargeTransaction(chargeReq)
-	resultMidtrans = append(resultMidtrans, res)
+	// var m map[string]interface{}
+	res, err := c.ChargeTransaction(chargeReq)
+	if res.StatusCode == "505" {
+		return nil, errorenum.KoneksiAndaKurangStabilCobaLagi
+	}
+	if res.StatusCode != "201" {
+		return nil, err
+	}
+	if req.BankTransferDetails.Bank == "bca" {
+		resultMidtrans = entity.BCA(*res)
+	}
 
 	return resultMidtrans, nil
+
 }
 
-func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation) ([]any, error) {
+func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
 	r.log.Info(ctx, "called")
-	resultObj, err := r.ChargeCoreApiBankTransfer(ctx, obj)
+	resultObj, err := r.ChargeCoreApiBankTransfer(ctx, obj, req)
 	if err != nil {
 		return nil, err
 	}
+
 	resultJSON, err := json.Marshal(resultObj)
 	if err != nil {
 		return nil, err

@@ -46,9 +46,10 @@ func (r *ginController) runcreatepaymentmidtransHandler() gin.HandlerFunc {
 
 		var req InportRequest
 		req.IDuser = id
+		req.BankTransferDetails = jsonReq.BankTransferDetails
+		req.PaymentType = jsonReq.PaymentType
+		req.TransactionDetails = jsonReq.TransactionDetails
 		req.Now = time.Now()
-		req.MoneyUser = jsonReq.MoneyUser
-		req.Bank = jsonReq.Bank
 		req.RandomString = util.GenerateID()
 		r.log.Info(ctx, util.MustJSON(req))
 
@@ -61,7 +62,6 @@ func (r *ginController) runcreatepaymentmidtransHandler() gin.HandlerFunc {
 
 		var jsonRes response
 		jsonRes.Item = res.Item
-
 		r.log.Info(ctx, util.MustJSON(jsonRes))
 		c.JSON(http.StatusOK, payload.NewSuccessResponse(jsonRes, traceID))
 

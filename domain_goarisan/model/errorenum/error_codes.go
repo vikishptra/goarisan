@@ -48,4 +48,6 @@ const (
 	PasswordTidakSama                                    apperror.ErrorType = "ER0042 password tidak sama"
 	EmailAndaTidakTerdaftarPergiUntukDaftarAkunAnda      apperror.ErrorType = "ER0043 email anda tidak terdaftar pergi untuk daftar akun anda"
 	TokenAndaSudahKadaluawarsa                           apperror.ErrorType = "ER0044 token anda sudah kadaluawarsa"
+	SistemSedangAdaMasalahMohonDiTunggu                  apperror.ErrorType = "ER0045 sistem sedang ada masalah mohon di tunggu"
+	KoneksiAndaKurangStabilCobaLagi                      apperror.ErrorType = "ER0046 koneksi anda kurang stabil di coba lagi !"
 )

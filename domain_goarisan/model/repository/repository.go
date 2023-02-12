@@ -67,7 +67,7 @@ type RunUpdateOwnerGrupRepo interface {
 }
 
 type PaymentArisanRepo interface {
-	ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation) ([]any, error)
-	SavePayment(ctx context.Context, obj *entity.Transcation) ([]any, error)
+	ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error)
+	SavePayment(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error)
 	MidtransGateway()
 }
