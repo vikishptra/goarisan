@@ -9,7 +9,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/joho/godotenv"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"golang.org/x/crypto/bcrypt"
@@ -24,6 +23,8 @@ import (
 	"vikishptra/shared/util"
 )
 
+var c coreapi.Client
+
 type Gateway struct {
 	log     logger.Logger
 	appData gogen.ApplicationData
@@ -33,25 +34,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-	// dbUser := os.Getenv("MYSQLUSER")
-	// dbPassword := os.Getenv("MYSQLPASSWORD")
-	// dbHost := os.Getenv("MYSQLHOST")
-	// dbPort := os.Getenv("MYSQLPORT")
-	// database := os.Getenv("MYSQLDATABASE")
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	dbUser := os.Getenv("MYSQLUSER")
+	dbPassword := os.Getenv("MYSQLPASSWORD")
+	dbHost := os.Getenv("MYSQLHOST")
+	dbPort := os.Getenv("MYSQLPORT")
+	database := os.Getenv("MYSQLDATABASE")
 
-	DbHost := os.Getenv("DB_HOST")
-	DbUser := os.Getenv("DB_USER")
-	DbPassword := os.Getenv("DB_PASSWORD")
-	DbName := os.Getenv("DB_NAME")
-	DbPort := os.Getenv("DB_PORT")
+	// DbHost := os.Getenv("DB_HOST")
+	// DbUser := os.Getenv("DB_USER")
+	// DbPassword := os.Getenv("DB_PASSWORD")
+	// DbName := os.Getenv("DB_NAME")
+	// DbPort := os.Getenv("DB_PORT")
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -68,12 +69,19 @@ func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Co
 	if err != nil {
 		panic(err)
 	}
+	go MidtransGateway()
+
 	return &Gateway{
 		log:     log,
 		appData: appData,
 		config:  cfg,
 		Db:      Db,
 	}
+}
+func MidtransGateway() {
+	midtrans.ServerKey = os.Getenv("SERVER_KEY_MIDTRANS")
+	midtrans.ClientKey = os.Getenv("CLIENT_KEY_MIDTRANS")
+	c.New(os.Getenv("SERVER_KEY_MIDTRANS"), midtrans.Sandbox)
 }
 
 func (r *Gateway) SaveUser(ctx context.Context, obj *entity.User) error {
@@ -256,7 +264,9 @@ func (r *Gateway) RunLogin(ctx context.Context, email, password string) (string,
 	if err := r.Db.First(&user, "email = ?", email); err.RecordNotFound() {
 		return "", "", nil, errorenum.UsernameAtauPasswordAndaSalah
 	}
-
+	if err := user.ValidateVerifyEmail(user.IsActive); err != nil {
+		return "", "", nil, err
+	}
 	err := UserPassword.VerifyPassword(password, user.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", "", nil, errorenum.UsernameAtauPasswordAndaSalah
@@ -408,7 +418,7 @@ func (r *Gateway) RunVerifyEmail(ctx context.Context, id, code string) error {
 		return errorenum.SepertinyaAdaYangSalahDariAnda
 	}
 	currentTime := time.Now()
-	then := user.Created.Add(time.Duration(24) * time.Second)
+	then := user.Created.Add(time.Duration(24) * time.Hour)
 	if currentTime.After(then) {
 		if err := r.Db.Model(entity.User{}).Where("id = ?", id).Update("created", time.Now()); err.RecordNotFound() {
 			return errorenum.SepertinyaAdaYangSalahDariAnda
@@ -461,14 +471,8 @@ func (r *Gateway) RunNewPasswordWithEmail(ctx context.Context, id, code string) 
 	return &user, nil
 
 }
-func (r *Gateway) MidtransGateway() {
-	midtrans.ServerKey = os.Getenv("SERVER_KEY_MIDTRANS")
-	midtrans.ClientKey = os.Getenv("CLIENT_KEY_MIDTRANS")
-}
 
 func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
-
-	r.MidtransGateway()
 	bank := req.BankTransferDetails.Bank
 	if bank != "bca" && bank != "bni" && bank != "bri" && bank != "permata" && bank != "mandiri" {
 		return nil, errorenum.BankTersebutTidakAda
@@ -481,8 +485,6 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 	}
 	var resultMidtrans []any
 	req.TransactionDetails.OrderID = obj.ID.String()
-	var c = coreapi.Client{}
-	c.New(os.Getenv("SERVER_KEY_MIDTRANS"), midtrans.Sandbox)
 
 	chargeReq := &coreapi.ChargeReq{
 		PaymentType:        req.PaymentType,
@@ -498,6 +500,7 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 		return nil, fmt.Errorf("%s: %s", res.StatusMessage, res.ValidationMessages)
 	}
 	obj.StatusTransaksi = res.TransactionStatus
+	obj.TRC_Midtrans = res.TransactionID
 	switch req.BankTransferDetails.Bank {
 	case "bca":
 		resultMidtrans = entity.BCA(*res)
@@ -513,22 +516,43 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 
 }
 
-func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
+func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation) error {
 	r.log.Info(ctx, "called")
-	resultObj, err := r.ChargeCoreApiBankTransfer(ctx, obj, req)
+	if err := r.Db.Save(&obj).Error; err != nil {
+		panic(err)
+	}
+	return nil
+}
+
+func (r *Gateway) PushNotificationMidtrans(ctx context.Context, orderID, trcIDMidtrans string) (*entity.Transcation, error) {
+	var Transcation entity.Transcation
+	if err := r.Db.Where("id = ? AND trc_midtrans = ?", orderID, trcIDMidtrans).Find(&Transcation); err.RecordNotFound() {
+		return nil, errorenum.DataNotFound
+	}
+
+	user, err := r.FindUserByID(ctx, Transcation.IDUser)
 	if err != nil {
 		return nil, err
 	}
 
-	// resultJSON, err := json.Marshal(resultObj)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// obj.ResponseMidtrans = string(resultJSON)
+	transactionStatusResp, e := c.CheckTransaction(orderID)
 
-	if err := r.Db.Save(&obj).Error; err != nil {
-		panic(err)
+	if e != nil {
+		return nil, e
+	} else {
+		if transactionStatusResp.TransactionStatus == "settlement" && transactionStatusResp.StatusCode == "200" {
+			Transcation.StatusTransaksi = "success"
+			if err := r.Db.Model(&user).Where("id = ?", user.ID).Update("money", user.Money+Transcation.MoneyUser); err.RecordNotFound() {
+				return nil, errorenum.SepertinyaAdaYangSalahDariAnda
+			}
+		} else if transactionStatusResp.TransactionStatus == "cancel" && transactionStatusResp.StatusCode == "202" {
+			Transcation.StatusTransaksi = "cancel"
+		} else if transactionStatusResp.TransactionStatus == "pending" && transactionStatusResp.StatusCode == "201" {
+			Transcation.StatusTransaksi = "pending"
+		} else {
+			Transcation.StatusTransaksi = "cancel"
+		}
 	}
 
-	return resultObj, nil
+	return &Transcation, nil
 }

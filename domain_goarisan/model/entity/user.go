@@ -128,7 +128,6 @@ func NewUser(req UserCreateRequest) (*User, error) {
 	var obj User
 	obj.ID = id
 	obj.Email = req.Email
-	obj.Created = req.Now
 	obj.Name = req.Name
 	obj.Money = 0
 	obj.VerificationCode = verification_code
@@ -139,6 +138,7 @@ func NewUser(req UserCreateRequest) (*User, error) {
 		FirstName: obj.Name,
 		Subject:   "Verifikasi code kamu!",
 	}
+	obj.Created = req.Now
 
 	go SendEmail(&obj, req.Email, &emailData, file, temp)
 

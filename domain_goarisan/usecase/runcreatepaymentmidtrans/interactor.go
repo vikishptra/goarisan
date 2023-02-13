@@ -24,8 +24,11 @@ func (r *runcreatepaymentmidtransInteractor) Execute(ctx context.Context, req In
 	if err != nil {
 		return nil, err
 	}
-	resultMidtrans, err := r.outport.SavePayment(ctx, resultObj, req.TranscationCreateRequest)
+	resultMidtrans, err := r.outport.ChargeCoreApiBankTransfer(ctx, resultObj, req.TranscationCreateRequest)
 	if err != nil {
+		return nil, err
+	}
+	if err := r.outport.SavePayment(ctx, resultObj); err != nil {
 		return nil, err
 	}
 

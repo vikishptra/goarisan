@@ -48,6 +48,9 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	router.GET("/change/password", r.runverifynewpasswordemailHandler())
 	router.POST("/new/password", r.runnewpasswordconfirmemailHandler())
 
+	//notification push
+	router.POST("/notification/push", r.runnotificationmidtransHandler())
+
 	resource := router.Group("/api/v1", r.AuthMid())
 
 	//fitur utama

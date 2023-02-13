@@ -11,6 +11,7 @@ import (
 
 type Transcation struct {
 	ID              vo.TransaksiID `bson:"_id" json:"id"`
+	TRC_Midtrans    string         `bson:"trc_midtrans" json:"trc_midtrans"`
 	IDUser          vo.UserID      `bson:"id_user" json:"id_user"`
 	MoneyUser       int64          `bson:"money_user" json:"money_user"`
 	StatusTransaksi string         `bson:"status_transaksi" json:"status_transaksi"`
