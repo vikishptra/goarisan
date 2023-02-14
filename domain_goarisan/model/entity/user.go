@@ -167,16 +167,6 @@ func (r *User) VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func (r *User) UpdateMoney(money int64) error {
-	if money < 0 {
-		return errorenum.MoneyAndaTidakBolehKurangDariUpdateMoney
-	}
-
-	r.Money = r.Money + money
-
-	return nil
-}
-
 func (r *User) CheckPasswordCriteria(password string) error {
 
 	var err error

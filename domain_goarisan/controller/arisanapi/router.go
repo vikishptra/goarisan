@@ -56,7 +56,6 @@ func (r *ginController) RegisterRouter(router selectedRouter) {
 	//fitur utama
 	//user
 	resource.PUT("/user/", r.runUserUpdateHandler())
-	resource.PUT("/user/money", r.runupdateusermoneyHandler())
 	resource.GET("/user/", r.findOneUserByIDHandler())
 
 	//grup

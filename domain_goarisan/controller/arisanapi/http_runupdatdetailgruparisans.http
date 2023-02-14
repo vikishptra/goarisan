@@ -1,4 +1,4 @@
-POST http://localhost:8000/api/v1/runupdatdetailgruparisans
+POST http://localhost:8001/api/v1/runupdatdetailgruparisans
 
 { 
   "grup": "", 

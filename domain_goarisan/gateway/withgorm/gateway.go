@@ -537,9 +537,11 @@ func (r *Gateway) PushNotificationMidtrans(ctx context.Context, orderID, trcIDMi
 		return nil, e
 	} else {
 		if transactionStatusResp.TransactionStatus == "settlement" && transactionStatusResp.StatusCode == "200" {
-			Transcation.StatusTransaksi = "success"
-			if err := r.Db.Model(&user).Where("id = ?", user.ID).Update("money", user.Money+Transcation.MoneyUser); err.RecordNotFound() {
-				return nil, errorenum.SepertinyaAdaYangSalahDariAnda
+			if Transcation.StatusTransaksi != "success" {
+				Transcation.StatusTransaksi = "success"
+				if err := r.Db.Model(&user).Where("id = ?", user.ID).Update("money", user.Money+Transcation.MoneyUser); err.RecordNotFound() {
+					return nil, errorenum.SepertinyaAdaYangSalahDariAnda
+				}
 			}
 		} else if transactionStatusResp.TransactionStatus == "cancel" && transactionStatusResp.StatusCode == "202" {
 			Transcation.StatusTransaksi = "cancel"

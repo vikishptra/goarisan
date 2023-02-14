@@ -27,7 +27,6 @@ import (
 	"vikishptra/domain_goarisan/usecase/runupdatdetailgruparisans"
 	"vikishptra/domain_goarisan/usecase/runupdategruparisanbyidowner"
 	"vikishptra/domain_goarisan/usecase/runupdateownergrup"
-	"vikishptra/domain_goarisan/usecase/runupdateusermoney"
 	"vikishptra/domain_goarisan/usecase/runusercreate"
 	"vikishptra/domain_goarisan/usecase/runuserlogin"
 	"vikishptra/domain_goarisan/usecase/runuserupdate"
@@ -79,7 +78,6 @@ func (apparisan) Run() error {
 		runupdatdetailgruparisans.NewUsecase(datasource),
 		findgrupbyiduser.NewUsecase(datasource),
 		runupdategruparisanbyidowner.NewUsecase(datasource),
-		runupdateusermoney.NewUsecase(datasource),
 		findoneuserbyid.NewUsecase(datasource),
 		runlogoutuser.NewUsecase(datasource),
 		runuserlogin.NewUsecase(datasource),
