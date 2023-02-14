@@ -9,6 +9,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"golang.org/x/crypto/bcrypt"
@@ -34,25 +35,25 @@ type Gateway struct {
 
 // NewGateway ...
 func NewGateway(log logger.Logger, appData gogen.ApplicationData, cfg *config.Config) *Gateway {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	dbUser := os.Getenv("MYSQLUSER")
-	dbPassword := os.Getenv("MYSQLPASSWORD")
-	dbHost := os.Getenv("MYSQLHOST")
-	dbPort := os.Getenv("MYSQLPORT")
-	database := os.Getenv("MYSQLDATABASE")
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+	// dbUser := os.Getenv("MYSQLUSER")
+	// dbPassword := os.Getenv("MYSQLPASSWORD")
+	// dbHost := os.Getenv("MYSQLHOST")
+	// dbPort := os.Getenv("MYSQLPORT")
+	// database := os.Getenv("MYSQLDATABASE")
 
-	// DbHost := os.Getenv("DB_HOST")
-	// DbUser := os.Getenv("DB_USER")
-	// DbPassword := os.Getenv("DB_PASSWORD")
-	// DbName := os.Getenv("DB_NAME")
-	// DbPort := os.Getenv("DB_PORT")
+	DbHost := os.Getenv("DB_HOST")
+	DbUser := os.Getenv("DB_USER")
+	DbPassword := os.Getenv("DB_PASSWORD")
+	DbName := os.Getenv("DB_NAME")
+	DbPort := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, database)
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
 
 	Db, err := gorm.Open("mysql", dsn)
 
@@ -474,7 +475,7 @@ func (r *Gateway) RunNewPasswordWithEmail(ctx context.Context, id, code string) 
 
 func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
 	bank := req.BankTransferDetails.Bank
-	if bank != "bca" && bank != "bni" && bank != "bri" && bank != "permata" && bank != "mandiri" {
+	if bank != "bca" && bank != "bni" && bank != "bri" && bank != "permata" {
 		return nil, errorenum.BankTersebutTidakAda
 	} else if strings.TrimSpace(string(req.PaymentType)) != "bank_transfer" {
 		return nil, errorenum.SepertinyaAdaYangSalahDariAndaHarusnyaBankTransfer
@@ -501,14 +502,9 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 	}
 	obj.StatusTransaksi = res.TransactionStatus
 	obj.TRC_Midtrans = res.TransactionID
-	switch req.BankTransferDetails.Bank {
-	case "bca":
-		resultMidtrans = entity.BCA(*res)
-	case "bni":
-		resultMidtrans = entity.BNI(*res)
-	case "bri":
-		resultMidtrans = entity.BRI(*res)
-	case "permata":
+	if req.BankTransferDetails.Bank != "permata" {
+		resultMidtrans = entity.VABANK(*res)
+	} else {
 		resultMidtrans = entity.PERMATA(*res)
 	}
 

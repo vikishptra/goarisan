@@ -25,39 +25,9 @@ type TranscationCreateRequest struct {
 	PaymentType         coreapi.CoreapiPaymentType   `json:"payment_type"`
 	BankTransferDetails *coreapi.BankTransferDetails `json:"bank_transfer"`
 	TransactionDetails  midtrans.TransactionDetails  `json:"transaction_details"`
-	EChannel            *coreapi.EChannelDetail      `json:"echannel"`
-
-	Now time.Time `json:"-"`
+	Now                 time.Time                    `json:"-"`
 }
-type BcaResponse struct {
-	StatusCode        string             `json:"status_code"`
-	StatusMessage     string             `json:"status_message"`
-	TransactionID     string             `json:"transaction_id"`
-	OrderID           string             `json:"order_id"`
-	GrossAmount       string             `json:"gross_amount"`
-	Currency          string             `json:"currency"`
-	PaymentType       string             `json:"payment_type"`
-	TransactionTime   string             `json:"transaction_time"`
-	TransactionStatus string             `json:"transaction_status"`
-	VaNumbers         []coreapi.VANumber `json:"va_numbers"`
-	FraudStatus       string             `json:"fraud_status"`
-}
-
-type BniResponse struct {
-	StatusCode        string             `json:"status_code"`
-	StatusMessage     string             `json:"status_message"`
-	TransactionID     string             `json:"transaction_id"`
-	OrderID           string             `json:"order_id"`
-	GrossAmount       string             `json:"gross_amount"`
-	Currency          string             `json:"currency"`
-	PaymentType       string             `json:"payment_type"`
-	TransactionTime   string             `json:"transaction_time"`
-	TransactionStatus string             `json:"transaction_status"`
-	VaNumbers         []coreapi.VANumber `json:"va_numbers"`
-	FraudStatus       string             `json:"fraud_status"`
-}
-
-type BriResponse struct {
+type VAResponse struct {
 	StatusCode        string             `json:"status_code"`
 	StatusMessage     string             `json:"status_message"`
 	TransactionID     string             `json:"transaction_id"`
@@ -85,66 +55,24 @@ type PermataResponse struct {
 	FraudStatus       string `json:"fraud_status"`
 }
 
-func BCA(res coreapi.ChargeResponse) []any {
-	var BCAResponse BcaResponse
-	BCAResponse.StatusCode = res.StatusCode
-	BCAResponse.StatusMessage = res.StatusMessage
-	BCAResponse.GrossAmount = res.GrossAmount
-	BCAResponse.TransactionID = res.TransactionID
-	BCAResponse.OrderID = res.OrderID
-	BCAResponse.GrossAmount = res.GrossAmount
-	BCAResponse.Currency = res.Currency
-	BCAResponse.PaymentType = res.PaymentType
-	BCAResponse.TransactionTime = res.TransactionTime
-	BCAResponse.TransactionStatus = res.TransactionStatus
-	BCAResponse.FraudStatus = res.FraudStatus
-	BCAResponse.VaNumbers = res.VaNumbers
+func VABANK(res coreapi.ChargeResponse) []any {
+	var VAResponse VAResponse
+	VAResponse.StatusCode = res.StatusCode
+	VAResponse.StatusMessage = res.StatusMessage
+	VAResponse.GrossAmount = res.GrossAmount
+	VAResponse.TransactionID = res.TransactionID
+	VAResponse.OrderID = res.OrderID
+	VAResponse.GrossAmount = res.GrossAmount
+	VAResponse.Currency = res.Currency
+	VAResponse.PaymentType = res.PaymentType
+	VAResponse.TransactionTime = res.TransactionTime
+	VAResponse.TransactionStatus = res.TransactionStatus
+	VAResponse.FraudStatus = res.FraudStatus
+	VAResponse.VaNumbers = res.VaNumbers
 
 	var resultMidtrans []any
 
-	resultMidtrans = append(resultMidtrans, BCAResponse)
-
-	return resultMidtrans
-}
-func BNI(res coreapi.ChargeResponse) []any {
-	var BNIResponse BcaResponse
-	BNIResponse.StatusCode = res.StatusCode
-	BNIResponse.StatusMessage = res.StatusMessage
-	BNIResponse.GrossAmount = res.GrossAmount
-	BNIResponse.TransactionID = res.TransactionID
-	BNIResponse.OrderID = res.OrderID
-	BNIResponse.GrossAmount = res.GrossAmount
-	BNIResponse.Currency = res.Currency
-	BNIResponse.PaymentType = res.PaymentType
-	BNIResponse.TransactionTime = res.TransactionTime
-	BNIResponse.TransactionStatus = res.TransactionStatus
-	BNIResponse.FraudStatus = res.FraudStatus
-	BNIResponse.VaNumbers = res.VaNumbers
-
-	var resultMidtrans []any
-
-	resultMidtrans = append(resultMidtrans, BNIResponse)
-
-	return resultMidtrans
-}
-func BRI(res coreapi.ChargeResponse) []any {
-	var BRIResponse BcaResponse
-	BRIResponse.StatusCode = res.StatusCode
-	BRIResponse.StatusMessage = res.StatusMessage
-	BRIResponse.GrossAmount = res.GrossAmount
-	BRIResponse.TransactionID = res.TransactionID
-	BRIResponse.OrderID = res.OrderID
-	BRIResponse.GrossAmount = res.GrossAmount
-	BRIResponse.Currency = res.Currency
-	BRIResponse.PaymentType = res.PaymentType
-	BRIResponse.TransactionTime = res.TransactionTime
-	BRIResponse.TransactionStatus = res.TransactionStatus
-	BRIResponse.FraudStatus = res.FraudStatus
-	BRIResponse.VaNumbers = res.VaNumbers
-
-	var resultMidtrans []any
-
-	resultMidtrans = append(resultMidtrans, BRIResponse)
+	resultMidtrans = append(resultMidtrans, VAResponse)
 
 	return resultMidtrans
 }
