@@ -473,20 +473,39 @@ func (r *Gateway) RunNewPasswordWithEmail(ctx context.Context, id, code string) 
 
 }
 
+func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation) error {
+	r.log.Info(ctx, "called")
+	if err := r.Db.Save(&obj).Error; err != nil {
+		panic(err)
+	}
+	return nil
+}
+
+// ChargeCoreApiBankTransfer adalah fungsi untuk melakukan charge transaksi menggunakan metode bank transfer
 func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Transcation, req entity.TranscationCreateRequest) ([]any, error) {
+	// Cek apakah nama bank yang diberikan valid
 	bank := req.BankTransferDetails.Bank
+
+	// Cek apakah metode pembayaran yang diberikan adalah bank transfer
 	if bank != "bca" && bank != "bni" && bank != "bri" && bank != "permata" {
 		return nil, errorenum.BankTersebutTidakAda
 	} else if strings.TrimSpace(string(req.PaymentType)) != "bank_transfer" {
 		return nil, errorenum.SepertinyaAdaYangSalahDariAndaHarusnyaBankTransfer
 	}
+
+	// Ambil data user yang akan melakukan transaksi
 	var user entity.User
 	if err := r.Db.First(&user, "id = ?", obj.IDUser); err.RecordNotFound() {
 		return nil, errorenum.HayoMauNgapain
 	}
+
+	// Siapkan variabel untuk menampung hasil transaksi dari midtrans
 	var resultMidtrans []any
+
+	// Set order ID dengan ID transaksi
 	req.TransactionDetails.OrderID = obj.ID.String()
 
+	// Siapkan data yang dibutuhkan untuk charge transaksi
 	chargeReq := &coreapi.ChargeReq{
 		PaymentType:        req.PaymentType,
 		BankTransfer:       req.BankTransferDetails,
@@ -496,61 +515,70 @@ func (r *Gateway) ChargeCoreApiBankTransfer(ctx context.Context, obj *entity.Tra
 			FName: user.Name,
 		},
 	}
+
+	// Lakukan charge transaksi menggunakan midtrans
 	res, err := c.ChargeTransaction(chargeReq)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", res.StatusMessage, res.ValidationMessages)
 	}
+
+	// Update status transaksi dan transaction ID pada objek transaksi
 	obj.StatusTransaksi = res.TransactionStatus
 	obj.TRC_Midtrans = res.TransactionID
+
+	// Jika bank yang digunakan tidak permata, set hasil charge menjadi Virtual Account
+	// Jika bank yang digunakan adalah permata, set hasil charge menjadi Permata VA
 	if req.BankTransferDetails.Bank != "permata" {
 		resultMidtrans = entity.VABANK(*res)
 	} else {
 		resultMidtrans = entity.PERMATA(*res)
 	}
 
+	// Kembalikan hasil charge transaksi
 	return resultMidtrans, nil
-
 }
 
-func (r *Gateway) SavePayment(ctx context.Context, obj *entity.Transcation) error {
-	r.log.Info(ctx, "called")
-	if err := r.Db.Save(&obj).Error; err != nil {
-		panic(err)
-	}
-	return nil
-}
-
+// PushNotificationMidtrans adalah fungsi untuk mengecek status transaksi pada midtrans
 func (r *Gateway) PushNotificationMidtrans(ctx context.Context, orderID, trcIDMidtrans string) (*entity.Transcation, error) {
+	// Mencari transaksi dengan orderID dan trcIDMidtrans yang sesuai
 	var Transcation entity.Transcation
 	if err := r.Db.Where("id = ? AND trc_midtrans = ?", orderID, trcIDMidtrans).Find(&Transcation); err.RecordNotFound() {
 		return nil, errorenum.DataNotFound
 	}
 
+	// Mencari data user yang melakukan transaksi
 	user, err := r.FindUserByID(ctx, Transcation.IDUser)
 	if err != nil {
 		return nil, err
 	}
 
+	// Melakukan pengecekan status transaksi dari Midtrans
 	transactionStatusResp, e := c.CheckTransaction(orderID)
 
 	if e != nil {
 		return nil, e
 	} else {
+		// Jika status transaksi sudah berhasil (settlement) dan kode status berhasil (200)
 		if transactionStatusResp.TransactionStatus == "settlement" && transactionStatusResp.StatusCode == "200" {
+			// Jika status transaksi pada database belum success, maka update status transaksi dan tambahkan money ke user
 			if Transcation.StatusTransaksi != "success" {
 				Transcation.StatusTransaksi = "success"
 				if err := r.Db.Model(&user).Where("id = ?", user.ID).Update("money", user.Money+Transcation.MoneyUser); err.RecordNotFound() {
 					return nil, errorenum.SepertinyaAdaYangSalahDariAnda
 				}
 			}
+			// Jika status transaksi dibatalkan (cancel) dan kode status berhasil (202)
 		} else if transactionStatusResp.TransactionStatus == "cancel" && transactionStatusResp.StatusCode == "202" {
 			Transcation.StatusTransaksi = "cancel"
+			// Jika status transaksi masih pending (pending) dan kode status berhasil (201)
 		} else if transactionStatusResp.TransactionStatus == "pending" && transactionStatusResp.StatusCode == "201" {
 			Transcation.StatusTransaksi = "pending"
+			// Jika status transaksi tidak berhasil, maka dianggap sebagai transaksi dibatalkan (cancel)
 		} else {
 			Transcation.StatusTransaksi = "cancel"
 		}
 	}
 
+	// Mengembalikan transaksi yang sudah diperbarui
 	return &Transcation, nil
 }
